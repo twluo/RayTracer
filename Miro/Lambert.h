@@ -8,6 +8,7 @@ class Lambert : public Material
 public:
     Lambert(const Vector3 & kd = Vector3(1),
             const Vector3 & ka = Vector3(0));
+	Lambert(const Vector3 & kd, const Vector3 & ka, int noise);
     virtual ~Lambert();
 
     const Vector3 & kd() const {return m_kd;}
@@ -22,6 +23,7 @@ public:
                           const Scene& scene) const;
 protected:
     Vector3 m_kd;
+	int noise;
     Vector3 m_ka;
 };
 

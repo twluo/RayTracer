@@ -159,6 +159,7 @@
     <ClInclude Include="MiroWindow.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="OpenGL.h" />
+    <ClInclude Include="Perlin.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Scene.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="TriangleMesh.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Worley.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BLPatch.cpp" />
@@ -178,11 +180,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MiroWindow.cpp" />
+    <ClCompile Include="Perlin.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="TriangleMeshLoad.cpp" />
+    <ClCompile Include="Worley.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

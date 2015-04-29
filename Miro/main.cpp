@@ -83,6 +83,7 @@ makeBunnyScene()
     g_scene->addLight(light);
 
     Material* mat = new Lambert(Vector3(1.0f));
+	Material* bmat = new Lambert(Vector3(1.0f), Vector3(0.0f), 1);
 
     TriangleMesh * bunny = new TriangleMesh;
     bunny->load("teapot.obj");
@@ -93,7 +94,7 @@ makeBunnyScene()
         Triangle* t = new Triangle;
         t->setIndex(i);
         t->setMesh(bunny);
-        t->setMaterial(mat); 
+        t->setMaterial(bmat); 
         g_scene->addObject(t);
     }
     
