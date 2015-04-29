@@ -10,8 +10,8 @@ m_kd(kd), m_ka(ka), noise(0), reflection(0)
 {
 
 }
-Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, float noise, float reflection) :
-m_kd(kd), m_ka(ka), noise(noise), reflection(reflection)
+Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, float noise, float reflection, float refractive) :
+m_kd(kd), m_ka(ka), noise(noise), reflection(reflection), refractive(refractive)
 {
 
 }
@@ -65,8 +65,15 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		result *= m_kd;
 
 		L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * result;
+        float temp;
+        if ((dot(viewDir, W_r)) > 0){
+            temp = (dot(viewDir, W_r));
+        }
+        else{
+            temp = 0;
+        }
 
-        Vector3 L_phong = m_ks*pow((dot(W_r, l)), 2);
+        Vector3 L_phong = rs*pow((temp), 0.2);// *abs(nDotL);
         L += L_phong;
 	}
 	// add the ambient component
@@ -82,6 +89,18 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 			}
 		}
 	}
+    else if (refractive != 0) {
+        if (ray.times < 3) {
+            r.o = hit.P;
+            r.d = -1 * (eta1 / eta2) * (viewDir - dot(viewDir, hit.N) * hit.N) - sqrtf(1 - pow((eta1 / eta2), 2) * (1 - pow(dot(viewDir, hit.N), 2))) * hit.N;
+            //r.d = -(eta1 / eta2)*(ray.d - dot(ray.d, hit.N)*hit.N) - sqrt(1 - pow((eta1 / eta2), 2) * (1 - pow(dot(hit.P, hit.N), 2)))*hit.N;
+            r.times = ray.times + 1;
+            if (scene.trace(hi, r)) {
+                if (hi.t > epsilon)
+                    L = reflection * hi.material->shade(r, hi, scene);
+            }
+        }
+    }
 	//L += F[0];
     
     return L;
