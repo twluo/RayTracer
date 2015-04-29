@@ -84,13 +84,14 @@ makeBunnyScene()
 
     Material* mat = new Lambert(Vector3(1.0f), Vector3(1.0f),Vector3 (1.0f),
 								0.5,0.5,0.0,
-								0, 0.7, 0);
+								0, 0.7, 0.3);
 
 	Material* bmat = new Lambert(Vector3(1.0f), Vector3(0.0f), Vector3(1.0f),
 								0.4, 0, 0.6,
-								0, 0, 0);
+								0, 0.3, 0.7);
 
     TriangleMesh * bunny = new TriangleMesh;
+
     bunny->load("teapot.obj");
     
     // create all the triangles in the bunny mesh and add to the scene

@@ -44,12 +44,12 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		float delta[maxOrder][3];
 		unsigned long *ID = new unsigned long();
 
-		WorleyNoise::noise3D(at, maxOrder, F, delta, ID);/*
+		WorleyNoise::noise3D(at, maxOrder, F, delta, ID);
 		cellN.x = (delta[2][0] - delta[1][0]) * noise;
 		cellN.y = (delta[2][1] - delta[1][1]) * noise;
-		cellN.z = (delta[2][2] - delta[1][2]) * noise;*/
-		cellN = (F[2] - F[1]) * noise;
-		L += PerlinNoise::noise(at[0], at[1], at[2]) * noise;
+		cellN.z = (delta[2][2] - delta[1][2]) * noise;
+		//cellN = (F[2] - F[1]) * noise;
+		//L += PerlinNoise::noise(at[0], at[1], at[2]) * noise;
 	}
 
 
@@ -73,7 +73,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		// get the diffuse component
 		float nDotL = dot(hit.N, l);
 		Vector3 color = pLight->color();
-		Vector3 result = color * m_kd * cellN * rd;
+		Vector3 result = (color * m_kd * cellN * rd) + PerlinNoise::noise(hit.P.x, hit.P.y, hit.P.z) * noise;
 		L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * result;
 		L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
 	}
