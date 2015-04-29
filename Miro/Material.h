@@ -11,9 +11,14 @@ public:
     virtual ~Material();
 
     virtual void preCalc() {}
-    
+
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
-                          const Scene& scene) const;
+        const Scene& scene) const;
+
+protected:
+    float rd; //Diffuse radiance
+    float rs; //Specular reflectance radiance
+    float rt; //Specular refracture radiance
 };
 
 #endif // CSE168_MATERIAL_H_INCLUDED

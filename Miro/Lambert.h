@@ -26,6 +26,10 @@ protected:
 	float noise;
 	float reflection;
     Vector3 m_ka;
+    float rd; //Diffuse radiance
+    float rs; //Specular reflectance radiance
+    float rt; //Specular refracture radiance
+    bool reflective = true;
 };
 
 #endif // CSE168_LAMBERT_H_INCLUDED
