@@ -82,8 +82,13 @@ makeBunnyScene()
     light->setWattage(500);
     g_scene->addLight(light);
 
-    Material* mat = new Lambert(Vector3(1.0f), Vector3(0.0f), 0, 0.3, 1);
-	Material* bmat = new Lambert(Vector3(1.0f), Vector3(0.0f), 0, 0, 1);
+    Material* mat = new Lambert(Vector3(1.0f), Vector3(1.0f),Vector3 (1.0f),
+								0.5,0.5,0.0,
+								0, 0.3, 0);
+
+	Material* bmat = new Lambert(Vector3(1.0f), Vector3(0.0f), Vector3(1.0f),
+								0.9, 0, 0.9,
+								0, 0, 0);
 
     TriangleMesh * bunny = new TriangleMesh;
     bunny->load("teapot.obj");
@@ -94,7 +99,7 @@ makeBunnyScene()
         Triangle* t = new Triangle;
         t->setIndex(i);
         t->setMesh(bunny);
-        t->setMaterial(mat); 
+        t->setMaterial(bmat); 
         g_scene->addObject(t);
     }
     
