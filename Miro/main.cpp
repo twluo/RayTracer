@@ -94,7 +94,7 @@ makeBunnyScene()
         Triangle* t = new Triangle;
         t->setIndex(i);
         t->setMesh(bunny);
-        t->setMaterial(bmat); 
+        t->setMaterial(mat); 
         g_scene->addObject(t);
     }
     

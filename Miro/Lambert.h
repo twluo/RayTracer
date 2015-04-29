@@ -25,9 +25,8 @@ protected:
     Vector3 m_kd;
 	int noise;
     Vector3 m_ka;
-    float rd; //Diffuse radiance
-    float rs; //Specular reflectance radiance
-    float rt; //Specular refracture radiance
+    float m_ks = 0.7; //Specular reflectance radiance
+    float m_kt; //Specular refracture radiance
     bool reflective = true;
 };
 

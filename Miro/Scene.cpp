@@ -56,6 +56,18 @@ Scene::raytraceImage(Camera *cam, Image *img)
             {
                 shadeResult = hitInfo.material->shade(ray, hitInfo, *this);
                 img->setPixel(i, j, shadeResult);
+                Lights::const_iterator lightIter;
+                /*for (lightIter = m_lights.begin(); lightIter != m_lights.end(); lightIter++)
+                {
+                    PointLight* pLight = *lightIter;
+
+                    Vector3 l = pLight->position() - hitInfo.P;
+                    Ray r = Ray(hitInfo.P, l);
+                    if (trace(hitInfo, r)){
+                        img->setPixel(i, j, Vector3(0));
+                    }
+                }*/
+
             }
         }
         img->drawScanline(j);

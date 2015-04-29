@@ -39,6 +39,8 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 	L += (F[2] - F[1]) * noise;
 	L += PerlinNoise::noise(hit.P.x, hit.P.y, hit.P.z) * noise;
 
+    Vector3 W_r = -2 * (dot(viewDir, hit.N))*hit.N + viewDir;
+
 	// loop over all of the lights
 	Lights::const_iterator lightIter;
 	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
@@ -59,6 +61,9 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		result *= m_kd;
 
 		L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * result;
+
+        Vector3 L_phong = m_ks*pow((dot(W_r, l)), 2);
+        L += L_phong;
 	}
 	// add the ambient component
 	L += m_ka;
