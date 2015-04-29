@@ -45,11 +45,11 @@ Scene::raytraceImage(Camera *cam, Image *img)
 {
     Ray ray;
     HitInfo hitInfo;
-	Ray altRay;
-	HitInfo altHitInfo;
-	bool shadow = false;
+    Ray altRay;
+    HitInfo altHitInfo;
+    bool shadow = false;
     Vector3 shadeResult;
-	const Lights *lightlist = this->lights();
+    const Lights *lightlist = this->lights();
     // loop over all pixels in the image
     for (int j = 0; j < img->height(); ++j)
     {
@@ -57,44 +57,43 @@ Scene::raytraceImage(Camera *cam, Image *img)
         {
             ray = cam->eyeRay(i, j, img->width(), img->height());
             if (trace(hitInfo, ray))
-			{
-				shadeResult = hitInfo.material->shade(ray, hitInfo, *this);
-				if (shadow) {
-					Lights::const_iterator lightIter;
-					ray.o = hitInfo.P;
-					for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
-					{
-						PointLight* pLight = *lightIter;
-						ray.d = pLight->position() - hitInfo.P;
-						if (trace(hitInfo, ray)) {
-							if (hitInfo.t > EPSILON) {
-								shadeResult = Vector3(0);
-								break;
-							}
-						}
-					}
-				}
+            {
+                shadeResult = hitInfo.material->shade(ray, hitInfo, *this);
+                if (shadow) {
+                    Lights::const_iterator lightIter;
+                    ray.o = hitInfo.P;
+                    for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
+                    {
+                        PointLight* pLight = *lightIter;
+                        ray.d = pLight->position() - hitInfo.P;
+                        if (trace(hitInfo, ray)) {
+                            if (hitInfo.t > EPSILON) {
+                                shadeResult = Vector3(0);
+                                break;
+                            }
+                        }
+                    }
+                }
                 img->setPixel(i, j, shadeResult);
                 Lights::const_iterator lightIter;
                 /*for (lightIter = m_lights.begin(); lightIter != m_lights.end(); lightIter++)
                 {
-                    PointLight* pLight = *lightIter;
-
-                    Vector3 l = pLight->position() - hitInfo.P;
-                    Ray r = Ray(hitInfo.P, l);
-                    if (trace(hitInfo, r)){
-                        img->setPixel(i, j, Vector3(0));
-                    }
+                PointLight* pLight = *lightIter;
+                Vector3 l = pLight->position() - hitInfo.P;
+                Ray r = Ray(hitInfo.P, l);
+                if (trace(hitInfo, r)){
+                img->setPixel(i, j, Vector3(0));
+                }
                 }*/
 
             }
         }
         img->drawScanline(j);
         glFinish();
-        printf("Rendering Progress: %.3f%%\r", j/float(img->height())*100.0f);
+        printf("Rendering Progress: %.3f%%\r", j / float(img->height())*100.0f);
         fflush(stdout);
     }
-    
+
     printf("Rendering Progress: 100.000%\n");
     debug("done Raytracing!\n");
 }
