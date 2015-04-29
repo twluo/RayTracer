@@ -77,17 +77,17 @@ makeBunnyScene()
 
     // create and place a point light source
     PointLight * light = new PointLight;
-    light->setPosition(Vector3(-2, 3, 5));
+    light->setPosition(Vector3(-3, 15, 3));
     light->setColor(Vector3(1, 1, 1));
     light->setWattage(500);
     g_scene->addLight(light);
 
     Material* mat = new Lambert(Vector3(1.0f), Vector3(1.0f),Vector3 (1.0f),
 								0.5,0.5,0.0,
-								0, 0.3, 0);
+								0, 0.7, 0);
 
 	Material* bmat = new Lambert(Vector3(1.0f), Vector3(0.0f), Vector3(1.0f),
-								0.1, 0, 0.9,
+								0.4, 0, 0.6,
 								0, 0, 0);
 
     TriangleMesh * bunny = new TriangleMesh;

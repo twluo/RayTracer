@@ -45,6 +45,8 @@ Scene::raytraceImage(Camera *cam, Image *img)
 {
     Ray ray;
     HitInfo hitInfo;
+	Ray altRay;
+	HitInfo altHitInfo;
 	bool shadow = false;
     Vector3 shadeResult;
 	const Lights *lightlist = this->lights();
