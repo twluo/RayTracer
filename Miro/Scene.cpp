@@ -55,8 +55,8 @@ Scene::raytraceImage(Camera *cam, Image *img)
         {
             ray = cam->eyeRay(i, j, img->width(), img->height());
             if (trace(hitInfo, ray))
-            {
-				shadeResult = hitInfo.material->shade(ray, hitInfo, *this); 
+			{
+				shadeResult = hitInfo.material->shade(ray, hitInfo, *this);
 				if (shadow) {
 					Lights::const_iterator lightIter;
 					ray.o = hitInfo.P;
@@ -66,7 +66,7 @@ Scene::raytraceImage(Camera *cam, Image *img)
 						ray.d = pLight->position() - hitInfo.P;
 						if (trace(hitInfo, ray)) {
 							if (hitInfo.t > EPSILON) {
-								shadeResult = Vector3(0, 0, 0);
+								shadeResult = Vector3(0);
 								break;
 							}
 						}
