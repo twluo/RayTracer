@@ -99,7 +99,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
             r.times = ray.times + 1;
             if (scene.trace(hi, r)) {
                 if (hi.t > epsilon)
-                    L += reflection * hi.material->shade(r, hi, scene);
+                    L += refractive * hi.material->shade(r, hi, scene);
             }
         }
     }
