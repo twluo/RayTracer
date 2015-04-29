@@ -22,6 +22,11 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
     
     const Lights *lightlist = scene.lights();
     
+    /*HitInfo  h = hit;
+    if (scene.trace(h, ray)){
+        return Vector3(0);
+    }*/
+
     // loop over all of the lights
     Lights::const_iterator lightIter;
     for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
@@ -29,7 +34,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
         PointLight* pLight = *lightIter;
     
         Vector3 l = pLight->position() - hit.P;
-        
+
         // the inverse-squared falloff
         float falloff = l.length2();
         
@@ -43,9 +48,14 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
         
         L += std::max(0.0f, nDotL/falloff * pLight->wattage() / PI) * result;
     }
-    
     // add the ambient component
     L += m_ka;
+
+    if (reflective){
+        Vector3 W_r = -2 * (dot(viewDir, hit.N))*hit.N + viewDir;
+        Ray r = Ray(hit.P, W_r);
+        shade(r, hit, scene);
+    }
     
     return L;
 }

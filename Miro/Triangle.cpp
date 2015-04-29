@@ -70,6 +70,7 @@ Triangle::intersect(HitInfo& result, const Ray& r,float tMin, float tMax)
     }
 
     //Calculate t after determining whether intersect in triangle
+
     result.t = dot(OA, normal) / dot(-r.d, normal);
 
     result.P = A + beta*B + gamma*C; //Barycentric coordinates
