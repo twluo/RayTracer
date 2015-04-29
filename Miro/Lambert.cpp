@@ -61,7 +61,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 
 		Vector3 l = pLight->position() - hit.P;
 
-		Vector3 W_r = (viewDir + l);
+		Vector3 W_r = 2 * dot(l, hit.N)*hit.N - l;
 		W_r.normalize();
 
 		// the inverse-squared falloff
@@ -75,7 +75,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		Vector3 color = pLight->color();
 		Vector3 result = color * m_kd * cellN * rd;
 		L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * result;
-		L += std::max(0.0f, powf(dot(hit.N, W_r), 1000)) * rs * color;
+		L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
 	}
 
 	L += m_ka * ra;
