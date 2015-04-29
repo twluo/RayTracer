@@ -8,6 +8,7 @@ class Ray
 public:
     Vector3 o,      //!< Origin of ray
             d;      //!< Direction of ray
+	int times;
 
     Ray() : o(), d(Vector3(0.0f,0.0f,1.0f))
     {

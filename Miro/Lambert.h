@@ -8,7 +8,7 @@ class Lambert : public Material
 public:
     Lambert(const Vector3 & kd = Vector3(1),
             const Vector3 & ka = Vector3(0));
-	Lambert(const Vector3 & kd, const Vector3 & ka, int noise);
+	Lambert(const Vector3 & kd, const Vector3 & ka, float noise, float reflection);
     virtual ~Lambert();
 
     const Vector3 & kd() const {return m_kd;}
@@ -23,7 +23,8 @@ public:
                           const Scene& scene) const;
 protected:
     Vector3 m_kd;
-	int noise;
+	float noise;
+	float reflection;
     Vector3 m_ka;
     float m_ks = 0.7; //Specular reflectance radiance
     float m_kt; //Specular refracture radiance

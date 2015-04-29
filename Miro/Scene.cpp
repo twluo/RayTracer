@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Image.h"
 #include "Console.h"
+#define EPSILON 0.0001
 
 Scene * g_scene = 0;
 
@@ -44,8 +45,9 @@ Scene::raytraceImage(Camera *cam, Image *img)
 {
     Ray ray;
     HitInfo hitInfo;
+	bool shadow = false;
     Vector3 shadeResult;
-    
+	const Lights *lightlist = this->lights();
     // loop over all pixels in the image
     for (int j = 0; j < img->height(); ++j)
     {
@@ -54,7 +56,22 @@ Scene::raytraceImage(Camera *cam, Image *img)
             ray = cam->eyeRay(i, j, img->width(), img->height());
             if (trace(hitInfo, ray))
             {
-                shadeResult = hitInfo.material->shade(ray, hitInfo, *this);
+				shadeResult = hitInfo.material->shade(ray, hitInfo, *this); 
+				if (shadow) {
+					Lights::const_iterator lightIter;
+					ray.o = hitInfo.P;
+					for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
+					{
+						PointLight* pLight = *lightIter;
+						ray.d = pLight->position() - hitInfo.P;
+						if (trace(hitInfo, ray)) {
+							if (hitInfo.t > EPSILON) {
+								shadeResult = Vector3(0, 0, 0);
+								break;
+							}
+						}
+					}
+				}
                 img->setPixel(i, j, shadeResult);
                 Lights::const_iterator lightIter;
                 /*for (lightIter = m_lights.begin(); lightIter != m_lights.end(); lightIter++)
