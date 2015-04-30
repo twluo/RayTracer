@@ -70,8 +70,8 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		if (ray.times < 2) {
 			r.o = hit.P;
 			r.d = -2 * dot(ray.d, hit.N)*hit.N + ray.d;
-			r.o = r.o + r.d * epsilon;
 			r.d.normalize();
+			r.o = r.o + r.d * epsilon;
 			r.times = ray.times + 1;
 			if (scene.trace(hi, r)) {
 				if (hi.t > epsilon)
@@ -80,7 +80,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		}
 	}
     if (refractive != 0) {
-        if (ray.times < 9) {
+        if (ray.times < 6) {
             r.o = hit.P;
 			float dot_ = dot(viewDir, hit.N);
 			float ratio;
@@ -95,8 +95,8 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 			float temp = (1 - pow(ratio, 2) * (1 - pow(dot_, 2)));
 			if (temp >= 0) {
 				r.d = -1 * ratio * (viewDir - dot_ * hit.N) - sqrt(temp)  * hit.N;
-				r.o = r.o + r.d * epsilon;
 				r.d.normalize();
+				r.o = r.o + r.d * epsilon;
 				r.times = ray.times + 1;
 				if (scene.trace(hi, r)) {
 					if (hi.t > epsilon)
@@ -113,14 +113,15 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		unsigned long *ID = new unsigned long();
 
 		WorleyNoise::noise3D(at, maxOrder, F, delta, ID);
-		/*
-		cellN.x = (delta[2][0] - delta[1][0]) * noise;
-		cellN.y = (delta[2][1] - delta[1][1]) * noise;
-		cellN.z = (delta[2][2] - delta[1][2]) * noise;
-		*/
-		cN = (F[2] - F[1]) * 1;
-		//L += cN ;
-		//L += PerlinNoise::noise(at[0], at[1], at[2]) * noise;
+		
+		//cellN.x = delta[1][0] * noise;
+		//cellN.y = delta[1][1] * noise;
+		//cellN.z = delta[1][2] * noise;
+		
+		cN = (F[2] - F[0]);
+		L += cN;
+		//L += cellN ;
+		L += PerlinNoise::noise(delta[0][0] + at[0], delta[0][1] + at[1], delta[0][2] + at[2]) ;
 	}
  
     return L;
