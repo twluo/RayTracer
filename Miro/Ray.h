@@ -9,13 +9,14 @@ public:
     Vector3 o,      //!< Origin of ray
         d;      //!< Direction of ray
     int times;
+	float snell;
 
-    Ray() : o(), d(Vector3(0.0f, 0.0f, 1.0f)), times(0)
+	Ray() : o(), d(Vector3(0.0f, 0.0f, 1.0f)), times(0), snell(1)
     {
         // empty
     }
 
-    Ray(const Vector3& o, const Vector3& d) : o(o), d(d), times(0)
+	Ray(const Vector3& o, const Vector3& d) : o(o), d(d), times(0), snell(1)
     {
         // empty
     }
