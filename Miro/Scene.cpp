@@ -47,7 +47,7 @@ Scene::raytraceImage(Camera *cam, Image *img)
     HitInfo hitInfo;
     Ray altRay;
     HitInfo altHitInfo;
-    bool shadow = false;
+    bool shadow = true;
     Vector3 shadeResult;
     const Lights *lightlist = this->lights();
     // loop over all pixels in the image
@@ -65,7 +65,9 @@ Scene::raytraceImage(Camera *cam, Image *img)
                     for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
                     {
                         PointLight* pLight = *lightIter;
-                        ray.d = pLight->position() - hitInfo.P;
+						ray.d = pLight->position() - hitInfo.P;
+						ray.d.normalize();
+						ray.o = ray.o + ray.d * epsilon;
                         if (trace(hitInfo, ray)) {
                             if (hitInfo.t > EPSILON) {
                                 shadeResult = Vector3(0);
@@ -73,20 +75,11 @@ Scene::raytraceImage(Camera *cam, Image *img)
                             }
                         }
                     }
-                }
-                img->setPixel(i, j, shadeResult);
-                Lights::const_iterator lightIter;
-                /*for (lightIter = m_lights.begin(); lightIter != m_lights.end(); lightIter++)
-                {
-                PointLight* pLight = *lightIter;
-                Vector3 l = pLight->position() - hitInfo.P;
-                Ray r = Ray(hitInfo.P, l);
-                if (trace(hitInfo, r)){
-                img->setPixel(i, j, Vector3(0));
-                }
-                }*/
-
-            }
+				}
+			}
+			else 
+				shadeResult = Vector3(0);
+			img->setPixel(i, j, shadeResult);
         }
         img->drawScanline(j);
         glFinish();

@@ -11,7 +11,7 @@ public:
 		const Vector3 & ks = Vector3(1));
     Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 & ks,
 		float rd, float ra, float rs, 
-		float noise, float reflection, float refractive);
+		float noise, float reflection, float refractive, float snell);
     virtual ~Lambert();
 
     const Vector3 & kd() const { return m_kd; }
@@ -35,6 +35,7 @@ protected:
     float ra; //Specular refracture radiance
     float eta1 = 1.0;
     float eta2 = 1.5;
+	float snell;
     float refractive;
 };
 
