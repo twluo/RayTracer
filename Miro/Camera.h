@@ -41,7 +41,8 @@ public:
     inline const Vector3 & eye() const      {return m_eye;}
     inline const Vector3 & bgColor() const  {return m_bgColor;}
 
-    Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
+	Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
+	Ray randomRay(int x, int y, int imageWidth, int imageHeight);
     
     void drawGL();
 

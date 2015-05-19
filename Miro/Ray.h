@@ -10,14 +10,29 @@ public:
         d;      //!< Direction of ray
     int times;
 	float snell;
+	int RBIntersections;
+	int RLIntersections;
+	Vector3 invd;
+	Vector3 dirs;
+	Vector3 inv() {
+		return Vector3(1 / d.x, 1 / d.y, 1 / d.z);
+	}
+	void update() {
+		invd = inv();
+	}
 
 	Ray() : o(), d(Vector3(0.0f, 0.0f, 1.0f)), times(0), snell(1)
     {
-        // empty
+		invd = inv();
+		//std::cout << d << std::endl;
+		//std::cout << dirs << std::endl;
     }
 
 	Ray(const Vector3& o, const Vector3& d) : o(o), d(d), times(0), snell(1)
-    {
+	{
+		invd = inv();
+		//std::cout << d << std::endl;
+		//std::cout << dirs << std::endl;
         // empty
     }
 };

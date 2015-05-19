@@ -22,10 +22,14 @@ public:
     void openGL(Camera *cam);
 
     void raytraceImage(Camera *cam, Image *img);
-    bool trace(HitInfo& minHit, const Ray& ray,
-               float tMin = 0.0f, float tMax = MIRO_TMAX) const;
+    bool trace(HitInfo& minHit, const Ray& ray, 
+		float tMin = 0.0f, float tMax = MIRO_TMAX) ;
+	void setSampleRate(int i) { numOfSamples = i; }
+	void toggleDraw() { draw = !draw; }
 
 protected:
+	bool draw;
+	int numOfSamples;
     Objects m_objects;
     BVH m_bvh;
     Lights m_lights;

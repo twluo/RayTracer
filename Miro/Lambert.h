@@ -14,6 +14,16 @@ public:
 		float noise, float reflection, float refractive, float snell);
     virtual ~Lambert();
 
+	virtual void setAmbient(const Vector3 &ka, float ra);
+	virtual void setDiffuse(const Vector3 &kd, float rd);
+	virtual void setSpecular(const Vector3 &ks, float r);
+	virtual void setReflectionConst(float rf);
+	virtual void setRefractionConst(float rf);
+	virtual void setSnellConstant(float snell);
+	virtual void setPattern(float noise);
+	Vector3 calcReflection(HitInfo hit, Ray r, Scene scene) const;
+	Vector3 calcRefraction(HitInfo hit, Ray ray, Scene scene) const;
+	Vector3 calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const;
     const Vector3 & kd() const { return m_kd; }
     const Vector3 & ka() const { return m_ka; }
 

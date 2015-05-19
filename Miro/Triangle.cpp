@@ -32,7 +32,13 @@ Triangle::renderGL()
     glEnd();
 }
 
-
+void Triangle::calculateCenteroid() {
+	TriangleMesh::TupleI3 ti = m_mesh->vIndices()[m_index];
+	const Vector3 & A = m_mesh->vertices()[ti.x]; //vertex a of triangle
+	const Vector3 & B = m_mesh->vertices()[ti.y]; //vertex b of triangle
+	const Vector3 & C = m_mesh->vertices()[ti.z]; //vertex c of triangle
+	centeroid = (A + B + C) / 3;
+}
 
 bool
 Triangle::intersect(HitInfo& result, const Ray& r,float tMin, float tMax)
@@ -46,39 +52,7 @@ Triangle::intersect(HitInfo& result, const Ray& r,float tMin, float tMax)
     const Vector3 & n_A = m_mesh->normals()[ti4.x]; //normal a of triangle
     const Vector3 & n_B = m_mesh->normals()[ti4.y]; //normal b of triangle
     const Vector3 & n_C = m_mesh->normals()[ti4.z]; //normal c of triangle
-	/*
-    const Vector3 OA = r.o - A;
-    const Vector3 BA = B - A;
-    const Vector3 CA = C - A;
 
-    Vector3 normal = cross(BA, CA); //Calculate the normal
-
-    //Check to make sure ray is not parallel to triangle
-    if (cross(normal, r.d) == Vector3(0)){
-        return false;
-    }
-
-    //Calculate beta and gamma
-	float det = 1 / (dot(-r.d, cross(BA, CA)));
-	float beta = dot(-r.d, cross(OA, CA)) * det;
-    float gamma = dot(-r.d, cross(BA, OA)) * det;
-
-    //Check to see if hit inside triangle
-    if ((beta < 0 || beta > 1) || (gamma < 0 || gamma > 1)){
-        return false;
-    }
-    if ((beta + gamma > 1) || (beta + gamma < 0)){
-        return false;
-    }
-
-    //Calculate t after determining whether intersect in triangle
-
-    result.t = dot(OA, normal) / dot(-r.d, normal);
-
-    result.P = (1-beta-gamma)*A + beta*B + gamma*C; //Barycentric coordinates
-    result.N = (1 - beta - gamma)*n_A + beta*n_B + gamma*n_C; //Smooth normal
-    result.N.normalize();
-	*/
 
 	//http://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 
@@ -99,6 +73,7 @@ Triangle::intersect(HitInfo& result, const Ray& r,float tMin, float tMax)
 		return false;
 	float t = invDet * dot(CA, q);
 	if (t > EPSILON) {
+		if (t < tMax && t > tMin)
 		result.t = t;
 		result.P = r.o + r.d * t;
 		result.N = (1 - u - v) * n_A + u * n_B + v * n_C;

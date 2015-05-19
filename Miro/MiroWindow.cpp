@@ -5,6 +5,7 @@
 #include "Image.h"
 #include <stdlib.h>
 #include <time.h>
+#include "Scene.h"
 
 #define ANGFACT     1.0
 #define LEFT        4
@@ -206,6 +207,11 @@ MiroWindow::keyboard(unsigned char key, int x, int y)
         case 'Z':
             g_camera->setEye(g_camera->eye() - m_scaleFact*g_camera->up());
         break;
+
+		case 'b':
+		case 'B':
+			g_scene->toggleDraw();
+		break;
 
         case 'a':
         case 'A':

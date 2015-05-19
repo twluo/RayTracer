@@ -15,10 +15,14 @@ public:
 
     virtual void renderGL() {}
     virtual void preCalc() {}
+	virtual Vector3 getCenteroid() { return Vector3(0, 0, 0); }
+	virtual Vector3 getMax() { return Vector3(0, 0, 0); }
+	virtual Vector3 getMin() { return Vector3(0, 0, 0); }
 
 
     virtual bool intersect(HitInfo& result, const Ray& ray,
                            float tMin = 0.0f, float tMax = MIRO_TMAX) = 0;
+	bool hit;
 
 protected:
     const Material* m_material;
