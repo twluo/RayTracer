@@ -73,13 +73,14 @@ Triangle::intersect(HitInfo& result, const Ray& r,float tMin, float tMax)
 		return false;
 	float t = invDet * dot(CA, q);
 	if (t > EPSILON) {
-		if (t < tMax && t > tMin)
-		result.t = t;
-		result.P = r.o + r.d * t;
-		result.N = (1 - u - v) * n_A + u * n_B + v * n_C;
-		result.N.normalize();
-		result.material = this->m_material;
-		return true;
+		if (t < tMax && t > tMin) {
+			result.t = t;
+			result.P = r.o + r.d * t;
+			result.N = (1 - u - v) * n_A + u * n_B + v * n_C;
+			result.N.normalize();
+			result.material = this->m_material;
+			return true;
+		}
 	}
 	return false;
 }

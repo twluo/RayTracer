@@ -17,7 +17,9 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 &ks)
 	noise = 0;
 	reflection = 0;
 	refractive = 0;
-	snell = 0;
+	refra = false;
+	refle = false;
+	snell = 1;
 }
 Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 & ks,
 	float rd, float ra, float rs, 
@@ -55,9 +57,11 @@ void Lambert::setSpecular(const Vector3 &ks, float rs) {
 }
 void Lambert::setReflectionConst(float rf) {
 	this->reflection = rf;
+	refle = true;
 }
 void Lambert::setRefractionConst(float rf) {
 	this->refractive = rf;
+	refra = true;
 }
 void Lambert::setSnellConstant(float snell) {
 	this->snell = snell;
@@ -106,13 +110,10 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 	}
 	L += m_ka * ra;
 	L += calcMonteCarlo(hit, ray, scene);
+	L += calcRefraction(hit, ray, scene);
     return L;
 }
 
-float frand() {
-
-	return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
-}
 
 Vector3 hemisphereSample_cos(float u, float v) {
 	float phi = v * 2.0 * PI;
@@ -125,9 +126,9 @@ Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
 	HitInfo hi; 
 	const Lights *lightlist = scene.lights();
 	// TODO:: MULTIPLY BY SPECULAR
-	if (ray.times == 2)
+	if (ray.times == 1)
 		return Vector3(0);
-	else if (ray.times < 2) {
+	else if (ray.times < 1) {
 		// transform x and y into camera space 
 		// -----------------------------------
 		//srand(time(NULL));
@@ -149,9 +150,6 @@ Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
 		r.update();
 		r.times = ray.times + 1;
 		if (scene.trace(hi, r)) {
-			//if (hi.t > epsilon)
-				if (dot(r.d, hit.N) < 0)
-					std::cout << "WARING" << std::endl;
 			return rd * dot(r.d, hit.N) * hi.material->shade(r, hi, scene);
 		}
 		return Vector3(0);
@@ -163,12 +161,12 @@ Vector3 Lambert::calcRefraction(HitInfo hit, Ray ray, Scene scene) const{
 	Ray r;
 	HitInfo hi;
 	const Vector3 viewDir = -ray.d; // d is a unit vector
-	   if (refractive != 0) {
-	       if (ray.times < 9) {
-	           r.o = hit.P;
+	if (refra) {
+		if (ray.times < 9) {
+			r.o = hit.P;
 			float dot_ = dot(viewDir, hit.N);
 			float ratio;
-			ratio = r.snell / this->snell;
+			ratio = ray.snell / this->snell;
 			if (dot_ > 0.0f) {
 				r.snell = this->snell;
 			}
@@ -196,7 +194,7 @@ Vector3 Lambert::calcReflection(HitInfo hit, Ray ray, Scene scene) const{
 	Vector3 L;
 	Ray r;
 	HitInfo hi;
-	if (reflection != 0) {
+	if (refle) {
 		// TODO:: MULTIPLY BY SPECULAR
 		if (ray.times < 2) {
 			r.o = hit.P;

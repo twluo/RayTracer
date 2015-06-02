@@ -113,7 +113,7 @@ makeCornellScene()
      
     // let objects do pre-calculations if needed
     g_scene->preCalc();
-	g_scene->setSampleRate(10000);
+	g_scene->setSampleRate(1);
 }
 // local helper function declarations
 namespace
@@ -149,11 +149,14 @@ makeTeapotScene()
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
+	material->setRefractionConst(1);
+	material->setSnellConstant(1.31);
 	TriangleMesh * teapot = new TriangleMesh;
 	teapot->load("teapot.obj");
 	addMeshTrianglesToScene(teapot, material);
 
 	// create the floor triangle
+	Material* material1 = new Lambert(Vector3(1.0f,0.0f,0.0f));
 	TriangleMesh * floor = new TriangleMesh;
 	floor->createSingleTriangle();
 	floor->setV1(Vector3(-10, 0, -10));
@@ -166,12 +169,12 @@ makeTeapotScene()
 	Triangle* t = new Triangle;
 	t->setIndex(0);
 	t->setMesh(floor);
-	t->setMaterial(material);
+	t->setMaterial(material1);
 	g_scene->addObject(t);
 
 	// let objects do pre-calculations if needed
 	g_scene->preCalc();
-	g_scene->setSampleRate(1);
+	g_scene->setSampleRate(16);
 }
 
 
@@ -221,6 +224,7 @@ makeBunny1Scene()
 
 	// let objects do pre-calculations if needed
 	g_scene->preCalc();
+	g_scene->setSampleRate(1);
 }
 
 
@@ -549,7 +553,7 @@ int
 main(int argc, char*argv[])
 {
     // create a scene
-    makeCornellScene();
+    makeTeapotScene();
 
     MiroWindow miro(&argc, argv);
     miro.mainLoop();

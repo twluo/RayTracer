@@ -47,6 +47,8 @@ protected:
     float eta2 = 1.5;
 	float snell;
     float refractive;
+	bool refra;
+	bool refle;
 };
 
 #endif // CSE168_LAMBERT_H_INCLUDED
