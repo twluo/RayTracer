@@ -109,8 +109,8 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
 	}
 	L += m_ka * ra;
-	L += calcMonteCarlo(hit, ray, scene);
 	L += calcRefraction(hit, ray, scene);
+	L += calcMonteCarlo(hit, ray, scene);
     return L;
 }
 
@@ -123,15 +123,12 @@ Vector3 hemisphereSample_cos(float u, float v) {
 }
 Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
 	Ray r;
-	HitInfo hi; 
+	HitInfo hi = HitInfo(); 
 	const Lights *lightlist = scene.lights();
 	// TODO:: MULTIPLY BY SPECULAR
 	if (ray.times == 1)
 		return Vector3(0);
 	else if (ray.times < 1) {
-		// transform x and y into camera space 
-		// -----------------------------------
-		//srand(time(NULL));
 		float v = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 		float w = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 		Vector3 dir = hemisphereSample_cos(v, w);
@@ -159,7 +156,7 @@ Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
 Vector3 Lambert::calcRefraction(HitInfo hit, Ray ray, Scene scene) const{
 	Vector3 L;
 	Ray r;
-	HitInfo hi;
+	HitInfo hi = HitInfo();
 	const Vector3 viewDir = -ray.d; // d is a unit vector
 	if (refra) {
 		if (ray.times < 9) {
