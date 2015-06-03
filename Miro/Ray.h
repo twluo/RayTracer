@@ -12,6 +12,7 @@ public:
 	float snell;
 	int RBIntersections;
 	int RLIntersections;
+	float power;
 	Vector3 invd;
 	Vector3 dirs;
 	Vector3 inv() {

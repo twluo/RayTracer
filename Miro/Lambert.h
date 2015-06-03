@@ -21,11 +21,12 @@ public:
 	virtual void setRefractionConst(float rf);
 	virtual void setSnellConstant(float snell);
 	virtual void setPattern(float noise);
-	Vector3 calcReflection(HitInfo hit, Ray r, Scene scene) const;
-	Vector3 calcRefraction(HitInfo hit, Ray ray, Scene scene) const;
-	Vector3 calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const;
+	Vector3 calcReflection(const Ray &ray, const HitInfo &hit, Scene scene) const;
+	Vector3 calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene) const;
+	Vector3 calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene) const;
     const Vector3 & kd() const { return m_kd; }
-    const Vector3 & ka() const { return m_ka; }
+	const Vector3 & ka() const { return m_ka; }
+	float snell;
 
     void setKd(const Vector3 & kd) { m_kd = kd; }
     void setKa(const Vector3 & ka) { m_ka = ka; }
@@ -33,18 +34,16 @@ public:
     virtual void preCalc() {}
 
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
-        const Scene& scene) const;
+		const Scene& scene) const;
+	float rd; //Diffuse radiance
+	float rs; //Specular reflectance radiance
+	float rf;//Specular refracture radiance
 protected:
 	Vector3 m_kd;
 	Vector3 m_ka;
 	Vector3 m_ks;
     float noise;
-    float reflection;
-    float rd; //Diffuse radiance
-    float rs; //Specular reflectance radiance
-    float ra; //Specular refracture radiance
-	float snell;
-    float refractive;
+	float ra;
 	bool refra;
 	bool refle;
 };

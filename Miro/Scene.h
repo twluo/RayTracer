@@ -5,6 +5,7 @@
 #include "Object.h"
 #include "PointLight.h"
 #include "BVH.h"
+#include "photonMap.h"
 
 class Camera;
 class Image;
@@ -20,14 +21,19 @@ public:
 
     void preCalc();
     void openGL(Camera *cam);
-
+	void photonTrace(Camera *cam, Image *img);
+	void normalTrace(Camera *cam, Image *img);
     void raytraceImage(Camera *cam, Image *img);
     bool trace(HitInfo& minHit, const Ray& ray, 
 		float tMin = 0.0f, float tMax = MIRO_TMAX) ;
 	void setSampleRate(int i) { numOfSamples = i; }
 	void toggleDraw() { draw = !draw; }
+	Ray getReflectedRay(HitInfo minHit, Ray ray);
+	Ray getRefractedRay(HitInfo minHit, Ray ray);
+	Ray getDiffusedRay(HitInfo minHit, Ray ray);
 
 protected:
+	Photon_map *pmap;
 	bool draw;
 	int numOfSamples;
     Objects m_objects;

@@ -162,6 +162,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="Perlin.h" />
+    <ClInclude Include="photonMap.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Scene.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MiroWindow.cpp" />
     <ClCompile Include="Perlin.cpp" />
+    <ClCompile Include="photonMap.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Triangle.cpp" />

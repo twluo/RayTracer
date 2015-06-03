@@ -136,10 +136,16 @@ makeTeapotScene()
 
 	// set up the camera
 	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
+	g_camera->setEye(Vector3(-2, 3, 5));
+	g_camera->setLookAt(Vector3(-.5, 1, 0));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+	/*
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
 	g_camera->setEye(Vector3(0, 3, 6));
 	g_camera->setLookAt(Vector3(0, 0, 0));
 	g_camera->setUp(Vector3(0, 1, 0));
-	g_camera->setFOV(45);
+	g_camera->setFOV(45);*/
 
 	// create and place a point light source
 	PointLight * light = new PointLight;
@@ -149,8 +155,8 @@ makeTeapotScene()
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
-	material->setRefractionConst(1);
-	material->setSnellConstant(1.31);
+	//material->setRefractionConst(1);
+	//material->setSnellConstant(1.31);
 	TriangleMesh * teapot = new TriangleMesh;
 	teapot->load("teapot.obj");
 	addMeshTrianglesToScene(teapot, material);
@@ -174,7 +180,7 @@ makeTeapotScene()
 
 	// let objects do pre-calculations if needed
 	g_scene->preCalc();
-	g_scene->setSampleRate(16);
+	g_scene->setSampleRate(1);
 }
 
 

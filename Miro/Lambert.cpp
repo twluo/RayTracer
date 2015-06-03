@@ -15,8 +15,7 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 &ks)
 	ra = 0;
 	rs = 0;
 	noise = 0;
-	reflection = 0;
-	refractive = 0;
+	rf = 0;
 	refra = false;
 	refle = false;
 	snell = 1;
@@ -32,8 +31,7 @@ Lambert::Lambert(const Vector3 & kd, const Vector3 & ka, const Vector3 & ks,
 	this->ra = ra;
 	this->rs = rs;
 	this->noise = noise;
-	this->reflection = reflection;
-	this->refractive = refractive;
+	this->rf = refractive;
 	this->snell = snell;
 
 }
@@ -54,13 +52,21 @@ void Lambert::setDiffuse(const Vector3 &kd, float rd) {
 void Lambert::setSpecular(const Vector3 &ks, float rs) {
 	this->rs = rs;
 	this->m_ks = ks;
+	refle = true;
+	refra = true;
+	rf = 1 - rd - rs;
 }
 void Lambert::setReflectionConst(float rf) {
-	this->reflection = rf;
+	this->rs = rf;
+	this->m_ks = Vector3(1.0f);
 	refle = true;
+	refra = true;
+	rf = 1 - rd - rs;
 }
 void Lambert::setRefractionConst(float rf) {
-	this->refractive = rf;
+	this->rf = rf;
+	rs = 1 - rd - rf;
+	refle = true;
 	refra = true;
 }
 void Lambert::setSnellConstant(float snell) {
@@ -75,15 +81,9 @@ Vector3
 Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 {
 	Vector3 L = Vector3(0.0f, 0.0f, 0.0f);
-	Ray r;
-	HitInfo hi;
-	bool shadow = true;
 	const Vector3 viewDir = -ray.d; // d is a unit vector
 
 	const Lights *lightlist = scene.lights();
-	Vector3 cellN = Vector3(1);
-	float cN = 1;
-
 
 	// loop over all of the lights
 	Lights::const_iterator lightIter;
@@ -109,8 +109,13 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 		L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
 	}
 	L += m_ka * ra;
-	L += calcRefraction(hit, ray, scene);
-	L += calcMonteCarlo(hit, ray, scene);
+	Ray r = ray;
+	HitInfo hi = hit;
+	Scene sc = scene;
+	L += calcRefraction(r, hi, sc);
+	L += calcReflection(r, hi, sc);
+	//printf("%f\n ", reflection);
+	//L += calcMonteCarlo(r, hi, sc);
     return L;
 }
 
@@ -121,12 +126,11 @@ Vector3 hemisphereSample_cos(float u, float v) {
 	float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
 	return Vector3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
 }
-Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
+Vector3 Lambert::calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene) const{
 	Ray r;
-	HitInfo hi = HitInfo(); 
-	const Lights *lightlist = scene.lights();
+	HitInfo hi; 
 	// TODO:: MULTIPLY BY SPECULAR
-	if (ray.times == 1)
+	if (ray.times >= 1)
 		return Vector3(0);
 	else if (ray.times < 1) {
 		float v = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
@@ -153,7 +157,7 @@ Vector3 Lambert::calcMonteCarlo(HitInfo hit, Ray ray, Scene scene) const{
 	}
 }
 
-Vector3 Lambert::calcRefraction(HitInfo hit, Ray ray, Scene scene) const{
+Vector3 Lambert::calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene) const{
 	Vector3 L;
 	Ray r;
 	HitInfo hi = HitInfo();
@@ -180,14 +184,14 @@ Vector3 Lambert::calcRefraction(HitInfo hit, Ray ray, Scene scene) const{
 				r.times = ray.times + 1;
 				if (scene.trace(hi, r)) {
 					if (hi.t > epsilon)
-						L += refractive * hi.material->shade(r, hi, scene);
+						L += rf * hi.material->shade(r, hi, scene);
 				}
 			}
 	       }
 	}
 	return L;
 }
-Vector3 Lambert::calcReflection(HitInfo hit, Ray ray, Scene scene) const{
+Vector3 Lambert::calcReflection(const Ray &ray, const HitInfo &hit, Scene scene) const{
 	Vector3 L;
 	Ray r;
 	HitInfo hi;
@@ -202,7 +206,7 @@ Vector3 Lambert::calcReflection(HitInfo hit, Ray ray, Scene scene) const{
 			r.times = ray.times + 1;
 			if (scene.trace(hi, r)) {
 				if (hi.t > epsilon)
-					L += reflection * hi.material->shade(r, hi, scene);
+					L += rs * hi.material->shade(r, hi, scene);
 			}
 		}
 	}
