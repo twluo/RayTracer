@@ -77,9 +77,9 @@ makeCornellScene()
 
     // create and place a point light source
     PointLight * light = new PointLight;
-    light->setPosition(Vector3(2.75, 5.4, -2.75));
+    light->setPosition(Vector3(2.75, 5.3, -2.75));
     light->setColor(Vector3(1, 1, 1));
-    light->setWattage(50);
+    light->setWattage(30);
 	g_scene->addLight(light);
 
 	Material* wmat = new Lambert();

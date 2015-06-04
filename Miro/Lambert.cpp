@@ -189,9 +189,12 @@ Vector3 Lambert::photonShade(const Ray& ray, const HitInfo& hit,
         float *ir = new float[3];
         float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
         float norm[3] = { hit.N.x, hit.N.y, hit.N.z };
-        pmap.irradiance_estimate(ir, pos, norm, 0.1, 50);
+        pmap.irradiance_estimate(ir, pos, norm, 0.5, 500);
         //fprintf(stderr, "irradiance estimate: %f %f %f\n", ir[0], ir[1], ir[2]);
-        L += Vector3(ir[0], ir[1], ir[2]);
+        //L += Vector3(ir[0], ir[1], ir[2]) * (PI * 0.5 * 0.5);
+        //L += Vector3(ir[0], ir[1], ir[2]) * pLight->color();
+
+        //fprintf(stderr, "L: %f %f %f\n", L.x, L.y, L.z);
     }
     L += m_ka * ra;
     Ray r = ray;

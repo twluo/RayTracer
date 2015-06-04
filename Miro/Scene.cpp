@@ -5,8 +5,8 @@
 #include "Console.h"
 #include <ctime>
 
-#define PNUM 200000
-#define IPNUM 1/PNUM
+#define PNUM 2000000
+#define IPNUM 1.0/PNUM
 #define EPSILON 0.0001
 
 Scene * g_scene = 0;
@@ -172,8 +172,12 @@ Scene::buildPhotonMap() {
 				else
 					break;
 			}
+
 		}
+        pmap->scale_photon_power(IPNUM);
+
 	}
+    pmap->balance();
 }
 
 void
@@ -278,6 +282,11 @@ Scene::photonTrace(Camera *cam, Image *img){
                 if (trace(hitInfo, ray))
                 {
                     shadeResult += hitInfo.material->photonShade(ray, hitInfo, *this, *pmap);
+                    float *ir = new float[3];
+                    float pos[3] = { hitInfo.P.x, hitInfo.P.y, hitInfo.P.z };
+                    float norm[3] = { hitInfo.N.x, hitInfo.N.y, hitInfo.N.z };
+                    pmap->irradiance_estimate(ir, pos, norm, 0.5, 700);
+                    shadeResult += Vector3(ir[0], ir[1], ir[2]);
                     if (!shadow) {
                         Lights::const_iterator lightIter;
                         ray.o = hitInfo.P;
