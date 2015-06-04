@@ -36,13 +36,16 @@ public:
 
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
 		const Scene& scene) const;
+    virtual Vector3 photonShade(const Ray& ray, const HitInfo& hit,
+        const Scene& scene, const Photon_map& pmap) const;
 	float rd; //Diffuse radiance
 	float rs; //Specular reflectance radiance
 	float rf;//Specular refracture radiance
+
+    Vector3 m_kd;
+    Vector3 m_ks;
 protected:
-	Vector3 m_kd;
-	Vector3 m_ka;
-	Vector3 m_ks;
+    Vector3 m_ka;
     float noise;
 	float ra;
 	bool refra;
