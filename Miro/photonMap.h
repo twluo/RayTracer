@@ -76,6 +76,7 @@ public:
 		float *dir,                    // direction of photon (returned)
 		const Photon *p) const;       // the photon
 	Photon *photons;
+	void draw();
 
 private:
 

@@ -113,7 +113,7 @@ makeCornellScene()
      
     // let objects do pre-calculations if needed
     g_scene->preCalc();
-	g_scene->setSampleRate(1);
+	g_scene->setSampleRate(16);
 }
 // local helper function declarations
 namespace
@@ -156,7 +156,7 @@ makeTeapotScene()
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
-	material->setDiffuse(Vector3(0.0f,1.0f,0.0f), 0.2);
+	material->setDiffuse(Vector3(0.0f,1.0f,0.0f), 1);
 	material->setSpecular(Vector3(1.0f,1.0f,1.0f), 0);
 	material->setAmbient(Vector3(1.0f), 0.05);
 	//material->setRefractionConst(1);
@@ -167,8 +167,8 @@ makeTeapotScene()
 
 	// create the floor triangle
 	Material* material1 = new Lambert(Vector3(1.0f,0.0f,0.0f));
-	material1->setDiffuse(Vector3(1.0f,0.0f,0.0f), 1);
-	material1->setSpecular(Vector3(1.0f), 0);
+	material1->setDiffuse(Vector3(1.0f,0.0f,0.0f), 0.5);
+	material1->setSpecular(Vector3(1.0f), 1);
 	material1->setAmbient(Vector3(1.0f), 0.05);
 	TriangleMesh * floor = new TriangleMesh;
 	floor->createSingleTriangle();

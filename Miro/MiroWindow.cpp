@@ -207,7 +207,10 @@ MiroWindow::keyboard(unsigned char key, int x, int y)
         case 'Z':
             g_camera->setEye(g_camera->eye() - m_scaleFact*g_camera->up());
         break;
-
+		case 'v':
+		case 'V':
+			g_scene->togglePMap();
+		break;
 		case 'b':
 		case 'B':
 			g_scene->toggleDraw();

@@ -77,11 +77,9 @@ void Lambert::setPattern(float noise) {
 }
 
 void Lambert::setConstant(float rd, float rs, float rf) {
-	if (rd + rs + rf == 1) {
 		this->rd = rd;
 		this->rs = rs;
 		this->rf = rf;
-	}
 }
 
 Vector3
@@ -189,23 +187,22 @@ Vector3 Lambert::photonShade(const Ray& ray, const HitInfo& hit,
         l /= sqrt(falloff);
 
         // get the diffuse component
+		float *ir = new float[3];
+		float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
+		float norm[3] = { hit.N.x, hit.N.y, hit.N.z };
+		pmap.irradiance_estimate(ir, pos, norm, .5, 500);
+		//fprintf(stderr, "irradiance estimate: %f %f %f\n", ir[0], ir[1], ir[2]);
+		Vector3 ira = Vector3(ir[0], ir[1], ir[2]);
         float nDotL = dot(hit.N, l);
-        Vector3 color = pLight->color();
-        L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * rd * color * m_kd;
-        L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
-        float *ir = new float[3];
-        float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
-        float norm[3] = { hit.N.x, hit.N.y, hit.N.z };
-        pmap.irradiance_estimate(ir, pos, norm, 0.1, 50);
-        //fprintf(stderr, "irradiance estimate: %f %f %f\n", ir[0], ir[1], ir[2]);
-        L += Vector3(ir[0], ir[1], ir[2]);
+		Vector3 color = pLight->color();
+		L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * rd * color * m_kd;
+        L += ira;
+		//std::cout << L << " " << ira << std::endl;
+        //L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
     }
-    L += m_ka * ra;
-    Ray r = ray;
-    HitInfo hi = hit;
-    Scene sc = scene;
-    L += calcRefraction(r, hi, sc);
-    L += calcReflection(r, hi, sc);
+    //L += m_ka * ra;
+    //L += calcRefraction(r, hi, sc);
+    L += calcPhotonReflection(ray, hit, scene, pmap);
     //printf("%f\n ", reflection);
     //L += calcMonteCarlo(r, hi, sc);
     return L;
@@ -242,6 +239,28 @@ Vector3 Lambert::calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene)
 				}
 			}
 	       }
+	}
+	return L;
+}
+Vector3 Lambert::calcPhotonReflection(const Ray &ray, const HitInfo &hit, 
+	Scene scene, const Photon_map& pmap) const{
+	Vector3 L;
+	Ray r;
+	HitInfo hi;
+	if (refle) {
+		// TODO:: MULTIPLY BY SPECULAR
+		if (ray.times < 2) {
+			r.o = hit.P;
+			r.d = -2 * dot(ray.d, hit.N)*hit.N + ray.d;
+			r.o = r.o + r.d * epsilon;
+			r.d.normalize();
+			r.update();
+			r.times = ray.times + 1;
+			if (scene.trace(hi, r)) {
+				if (hi.t > epsilon)
+					L += rs * hi.material->photonShade(r, hi, scene, pmap) * m_ks;
+			}
+		}
 	}
 	return L;
 }
