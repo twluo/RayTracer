@@ -6,7 +6,7 @@
 #include <ctime>
 
 #define PNUM 2000000
-#define IPNUM 1.0/PNUM
+#define IPNUM 1/PNUM
 #define EPSILON 0.0001
 
 Scene * g_scene = 0;
@@ -23,7 +23,9 @@ Scene::openGL(Camera *cam)
         m_objects[i]->renderGL();
 	if (draw)
 		m_bvh.draw();
-
+	if (pmapd){
+		pmap->draw();
+	}
     glutSwapBuffers();
 }
 
@@ -48,7 +50,8 @@ Scene::preCalc()
 	draw = false;
 	int leafCount = 0;
 	int nodeCount = 0;
-	m_bvh.count(leafCount, nodeCount);
+	m_bvh.count(leafCount, nodeCount); 
+	buildPhotonMap();
 	std::cout << "number of leaf is " << leafCount << " and number of nodes is " << nodeCount << std::endl;
 }
 
@@ -116,9 +119,11 @@ Scene::buildPhotonMap() {
 	const Lights *lightlist = lights();
 	Lights::const_iterator lightIter; 
 	Ray r;
+	int pnum = 0;
+	clock_t t;
+	t = clock();
 	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++) {
 		int stored = 0;
-		int pnum = 0;
 		while (stored <= PNUM) {
 			PointLight* pLight = *lightIter;
 			r.o = pLight->position();
@@ -141,43 +146,41 @@ Scene::buildPhotonMap() {
 					float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
 					float dir[3] = { r.d.x, r.d.y, r.d.z };
 					float pow[3] = { r.power.x, r.power.y, r.power.z };
+					pmap->store(pow, pos, dir);
 					stored++;
 					float rd = hit.material->rd;
 					float rs = hit.material->rs;
 					float rf = hit.material->rf;
 					float ran = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
-					if (ran < rs) {
-						float nr = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (rd + rs);
-						if (nr < rd) {
-							Ray nr = getDiffusedRay(hit, r);
-							r = nr;
-                            r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_kd / PI * hit.material->rd;
-                            float npow[3] = { r.power.x, r.power.y, r.power.z };
-                            pmap->store(npow, pos, dir);
-
-						}
-						else {
-							Ray nr = getReflectedRay(hit, r);
-                            r = nr;
-                            r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_ks / PI * hit.material->rs;
-                            float npow[3] = { r.power.x, r.power.y, r.power.z };
-                            pmap->store(npow, pos, dir);
-						}
+					if (ran < rd) {
+						//printf("DIFFUSED\n");
+						Ray nr = getDiffusedRay(hit, r);
+						r = nr;
+						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_kd / PI * hit.material->rd;
 					}
-                    else {
-                        pmap->store(pow, pos, dir);
-                        break;
-                    }
+					else if (ran < rd + rs) {
+						//printf("REFLECTED\n");
+						Ray nr = getReflectedRay(hit, r);
+						r = nr;
+						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_ks / PI * hit.material->rs;
+					}
+					else {
+						//printf("ABSORBED\n");
+						break;
+					}
 				}
 				else
 					break;
 			}
-
 		}
-        pmap->scale_photon_power(IPNUM);
-
 	}
-    pmap->balance();
+	clock_t temp = clock() - t;
+	printf("Time Elapsed: (%f seconds)./n", ((float)temp) / CLOCKS_PER_SEC);
+
+	float scale = pnum;
+	scale = 1 / scale;
+	pmap->scale_photon_power(scale);
+	pmap->balance();
 }
 
 void
@@ -281,12 +284,12 @@ Scene::photonTrace(Camera *cam, Image *img){
                 rayCount++;
                 if (trace(hitInfo, ray))
                 {
-                    shadeResult += hitInfo.material->photonShade(ray, hitInfo, *this, *pmap);
-                    float *ir = new float[3];
-                    float pos[3] = { hitInfo.P.x, hitInfo.P.y, hitInfo.P.z };
-                    float norm[3] = { hitInfo.N.x, hitInfo.N.y, hitInfo.N.z };
-                    pmap->irradiance_estimate(ir, pos, norm, 0.5, 700);
-                    shadeResult += Vector3(ir[0], ir[1], ir[2]);
+					shadeResult += hitInfo.material->photonShade(ray, hitInfo, *this, *pmap);
+					/*float *ir = new float[3];
+					float pos[3] = { hitInfo.P.x, hitInfo.P.y, hitInfo.P.z };
+					float norm[3] = { hitInfo.N.x, hitInfo.N.y, hitInfo.N.z };
+					pmap->irradiance_estimate(ir, pos, norm, 0.1, 500);
+					shadeResult *= Vector3(ir[0], ir[1], ir[2]);*/
                     if (!shadow) {
                         Lights::const_iterator lightIter;
                         ray.o = hitInfo.P;
@@ -332,11 +335,7 @@ Scene::photonTrace(Camera *cam, Image *img){
 void
 Scene::raytraceImage(Camera *cam, Image *img)
 {
-    buildPhotonMap();
-    
-	Photon *t = &pmap->photons[1];
-	printf("%f\n",t->pos[0]);
-	pmap->balance();
+	
 	//normalTrace(cam, img);
     photonTrace(cam, img);
     
