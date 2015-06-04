@@ -206,7 +206,7 @@ Vector3 Lambert::calcReflection(const Ray &ray, const HitInfo &hit, Scene scene)
 			r.times = ray.times + 1;
 			if (scene.trace(hi, r)) {
 				if (hi.t > epsilon)
-					L += rs * hi.material->shade(r, hi, scene);
+					L += rs * hi.material->shade(r, hi, scene) * m_kd;
 			}
 		}
 	}

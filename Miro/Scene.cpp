@@ -43,7 +43,7 @@ Scene::preCalc()
         PointLight* pLight = *lit;
         pLight->preCalc();
     }
-	pmap = new Photon_map(PNUM * 5);
+	pmap = new Photon_map(PNUM * m_lights.size());
     m_bvh.build(&m_objects);
 	draw = false;
 	int leafCount = 0;
@@ -112,14 +112,17 @@ Ray Scene::getDiffusedRay(HitInfo hit, Ray ray) {
 	return r;
 }
 void
-Scene::photonTrace(Camera *cam, Image *img) {
+Scene::buildPhotonMap() {
 	const Lights *lightlist = lights();
 	Lights::const_iterator lightIter; 
 	Ray r;
 	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++) {
-		for (int i = 0; i < 2000; i++) {
+		int stored = 0;
+		int pnum = 0;
+		while (stored <= PNUM) {
 			PointLight* pLight = *lightIter;
 			r.o = pLight->position();
+			pnum++;
 			float x;
 			float y;
 			float z;
@@ -131,7 +134,7 @@ Scene::photonTrace(Camera *cam, Image *img) {
 			r.d = Vector3(x, y, z);
 			r.d.normalize();
 			r.update();
-			r.power = pLight->wattage() * IPNUM;
+			r.power = pLight->wattage();
 			HitInfo hit;
 			while (true) {
 				if (trace(hit, r)) {
@@ -139,6 +142,7 @@ Scene::photonTrace(Camera *cam, Image *img) {
 					float dir[3] = { r.d.x, r.d.y, r.d.z };
 					float pow[3] = { r.power, r.power, r.power };
 					pmap->store(pow, pos, dir);
+					stored++;
 					float rd = hit.material->rd;
 					float rs = hit.material->rs;
 					float rf = hit.material->rf;
@@ -239,7 +243,9 @@ void
 Scene::raytraceImage(Camera *cam, Image *img)
 {
 	photonTrace(cam, img);
-	printf("%f\n",pmap->photons[0].pos[0]);
+	Photon *t = &pmap->photons[1];
+	printf("%f\n",t->pos[0]);
+	pmap->balance();
 	normalTrace(cam, img);
     
 }

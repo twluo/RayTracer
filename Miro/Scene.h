@@ -21,7 +21,7 @@ public:
 
     void preCalc();
     void openGL(Camera *cam);
-	void photonTrace(Camera *cam, Image *img);
+	void buildPhotonMap();
 	void normalTrace(Camera *cam, Image *img);
     void raytraceImage(Camera *cam, Image *img);
     bool trace(HitInfo& minHit, const Ray& ray, 

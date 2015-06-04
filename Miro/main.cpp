@@ -149,9 +149,10 @@ makeTeapotScene()
 
 	// create and place a point light source
 	PointLight * light = new PointLight;
-	light->setPosition(Vector3(10, 10, 10));
+	//light->setPosition(Vector3(10, 10, 10));
+	light->setPosition(Vector3(-3, 15, 3));
 	light->setColor(Vector3(1, 1, 1));
-	light->setWattage(700);
+	light->setWattage(500);
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
@@ -163,6 +164,7 @@ makeTeapotScene()
 
 	// create the floor triangle
 	Material* material1 = new Lambert(Vector3(1.0f,0.0f,0.0f));
+	//material1->setSpecular(Vector3(1.0f), 1);
 	TriangleMesh * floor = new TriangleMesh;
 	floor->createSingleTriangle();
 	floor->setV1(Vector3(-10, 0, -10));
