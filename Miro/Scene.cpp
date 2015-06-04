@@ -336,8 +336,8 @@ void
 Scene::raytraceImage(Camera *cam, Image *img)
 {
 	
-	//normalTrace(cam, img);
-    photonTrace(cam, img);
+	normalTrace(cam, img);
+    //photonTrace(cam, img);
     
 }
 

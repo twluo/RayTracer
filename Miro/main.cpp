@@ -77,9 +77,9 @@ makeCornellScene()
 
     // create and place a point light source
     PointLight * light = new PointLight;
-    light->setPosition(Vector3(2.75, 5.3, -2.75));
+    light->setPosition(Vector3(2.75, 5.4, -2.75));
     light->setColor(Vector3(1, 1, 1));
-    light->setWattage(30);
+    light->setWattage(50);
 	g_scene->addLight(light);
 
 	Material* wmat = new Lambert();
@@ -162,7 +162,7 @@ makeTeapotScene()
 	//material->setRefractionConst(1);
 	material->setSnellConstant(1.31);
 	TriangleMesh * teapot = new TriangleMesh;
-	teapot->load("teapot.obj");
+	teapot->load("star.obj");
 	addMeshTrianglesToScene(teapot, material);
 
 	// create the floor triangle
