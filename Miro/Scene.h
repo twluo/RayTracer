@@ -31,6 +31,7 @@ public:
 	Ray getReflectedRay(HitInfo minHit, Ray ray);
 	Ray getRefractedRay(HitInfo minHit, Ray ray);
 	Ray getDiffusedRay(HitInfo minHit, Ray ray);
+    void photonTrace(Camera *cam, Image *img);
 
 protected:
 	Photon_map *pmap;

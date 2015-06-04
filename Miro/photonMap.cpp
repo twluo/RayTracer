@@ -83,9 +83,12 @@ void Photon_map::irradiance_estimate(
 
 	// locate the nearest photons
 	locate_photons(&np, 1);
+    //fprintf(stderr, "NP: %f\n", np.pos[0]);
 
 	// if less than 8 photons return
 	if (np.found<8)
+        //fprintf(stderr, "LESS THAN 8\n");
+
 		return;
 
 	float pdir[3];
@@ -104,6 +107,7 @@ void Photon_map::irradiance_estimate(
 	}
 
 	const float tmp = (1.0f / PI) / (np.dist2[0]);	// estimate of density
+    //fprintf(stderr, "IR: %f\n", tmp);
 
 	irrad[0] *= tmp;
 	irrad[1] *= tmp;

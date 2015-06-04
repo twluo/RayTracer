@@ -561,7 +561,7 @@ int
 main(int argc, char*argv[])
 {
     // create a scene
-    makeTeapotScene();
+    makeCornellScene();
 
     MiroWindow miro(&argc, argv);
     miro.mainLoop();

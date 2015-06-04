@@ -157,6 +157,53 @@ Vector3 Lambert::calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene)
 	}
 }
 
+Vector3 Lambert::photonShade(const Ray& ray, const HitInfo& hit,
+    const Scene& scene, const Photon_map& pmap) const{
+    Vector3 L = Vector3(0.0f, 0.0f, 0.0f);
+    const Vector3 viewDir = -ray.d; // d is a unit vector
+
+    const Lights *lightlist = scene.lights();
+
+    // loop over all of the lights
+    Lights::const_iterator lightIter;
+    for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++)
+    {
+        PointLight* pLight = *lightIter;
+
+        Vector3 l = pLight->position() - hit.P;
+
+        Vector3 W_r = 2 * dot(l, hit.N)*hit.N - l;
+        W_r.normalize();
+
+        // the inverse-squared falloff
+        float falloff = l.length2();
+
+        // normalize the light direction
+        l /= sqrt(falloff);
+
+        // get the diffuse component
+        float nDotL = dot(hit.N, l);
+        Vector3 color = pLight->color();
+        L += std::max(0.0f, nDotL / falloff * pLight->wattage() / PI) * rd * color * m_kd;
+        L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
+        float *ir = new float[3];
+        float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
+        float norm[3] = { hit.N.x, hit.N.y, hit.N.z };
+        pmap.irradiance_estimate(ir, pos, norm, 0.1, 50);
+        //fprintf(stderr, "irradiance estimate: %f %f %f\n", ir[0], ir[1], ir[2]);
+        L += Vector3(ir[0], ir[1], ir[2]);
+    }
+    L += m_ka * ra;
+    Ray r = ray;
+    HitInfo hi = hit;
+    Scene sc = scene;
+    L += calcRefraction(r, hi, sc);
+    L += calcReflection(r, hi, sc);
+    //printf("%f\n ", reflection);
+    //L += calcMonteCarlo(r, hi, sc);
+    return L;
+}
+
 Vector3 Lambert::calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene) const{
 	Vector3 L;
 	Ray r;
