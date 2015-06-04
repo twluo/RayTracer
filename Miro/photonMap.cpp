@@ -43,15 +43,7 @@ Photon_map :: ~Photon_map()
 {
 	free(photons);
 }
-void Photon_map::draw() {
-	glBegin(GL_POINTS);
-	glPointSize(2);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	for (int i = 0; i < stored_photons; i++) {
-		glVertex3f(photons[i].pos[0], photons[i].pos[1], photons[i].pos[2]);
-	}
-	glEnd();
-}
+
 
 /* photon_dir returns the direction of a photon
 */
