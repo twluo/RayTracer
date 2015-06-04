@@ -14,6 +14,7 @@ public:
 	virtual void setAmbient(const Vector3 &ka, float ra) {}
 	virtual void setDiffuse(const Vector3 &kd, float rd) {}
 	virtual void setSpecular(const Vector3 &ks, float r) {}
+	virtual void setConstant(float rd, float rs, float rf) {}
 	virtual void setReflectionConst(float rf) {}
 	virtual void setRefractionConst(float rf) {}
 	virtual void setSnellConstant(float snell) {}

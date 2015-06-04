@@ -76,6 +76,13 @@ void Lambert::setPattern(float noise) {
 	this->noise = noise;
 }
 
+void Lambert::setConstant(float rd, float rs, float rf) {
+	if (rd + rs + rf == 1) {
+		this->rd = rd;
+		this->rs = rs;
+		this->rf = rf;
+	}
+}
 
 Vector3
 Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
@@ -206,7 +213,7 @@ Vector3 Lambert::calcReflection(const Ray &ray, const HitInfo &hit, Scene scene)
 			r.times = ray.times + 1;
 			if (scene.trace(hi, r)) {
 				if (hi.t > epsilon)
-					L += rs * hi.material->shade(r, hi, scene) * m_kd;
+					L += rs * hi.material->shade(r, hi, scene) * m_ks;
 			}
 		}
 	}

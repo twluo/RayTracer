@@ -21,6 +21,7 @@ public:
 	virtual void setRefractionConst(float rf);
 	virtual void setSnellConstant(float snell);
 	virtual void setPattern(float noise);
+	virtual void setConstant(float rd, float rs, float rf);
 	Vector3 calcReflection(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene) const;

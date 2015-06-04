@@ -134,13 +134,13 @@ Scene::buildPhotonMap() {
 			r.d = Vector3(x, y, z);
 			r.d.normalize();
 			r.update();
-			r.power = pLight->wattage();
+			r.power = pLight->wattage() * pLight->color();
 			HitInfo hit;
 			while (true) {
 				if (trace(hit, r)) {
 					float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
 					float dir[3] = { r.d.x, r.d.y, r.d.z };
-					float pow[3] = { r.power, r.power, r.power };
+					float pow[3] = { r.power.x, r.power.y, r.power.z };
 					pmap->store(pow, pos, dir);
 					stored++;
 					float rd = hit.material->rd;
@@ -148,8 +148,8 @@ Scene::buildPhotonMap() {
 					float rf = hit.material->rf;
 					float ran = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 					if (ran < rs) {
-						float nr = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (rd + rs);
-						if (nr < rd) {
+						float nran = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (rd + rs);
+						if (nran < rd) {
 							Ray nr = getDiffusedRay(hit, r);
 							r = nr;
 						}
@@ -166,6 +166,8 @@ Scene::buildPhotonMap() {
 			}
 		}
 	}
+	pmap->scale_photon_power(IPNUM);
+	pmap->balance();
 }
 
 void
@@ -177,12 +179,14 @@ Scene::normalTrace(Camera *cam, Image *img) {
 	int rayCount = 0;
 	int progress = 0;
 	int bounceCount = 0;
+	bool fhit = false;
 	// loop over all pixels in the image
 #pragma omp parallel for
 	for (int j = 0; j < img->height(); ++j)
 	{
 		for (int i = 0; i < img->width(); ++i)
 		{
+			fhit = false;
 			Vector3 shadeResult;
 			Ray ray;
 			HitInfo hitInfo;
@@ -197,6 +201,7 @@ Scene::normalTrace(Camera *cam, Image *img) {
 				rayCount++;
 				if (trace(hitInfo, ray))
 				{
+					fhit = true;
 					shadeResult += hitInfo.material->shade(ray, hitInfo, *this);
 					if (!shadow) {
 						Lights::const_iterator lightIter;
@@ -220,7 +225,10 @@ Scene::normalTrace(Camera *cam, Image *img) {
 				else
 					shadeResult += Vector3(0);
 			}
-			shadeResult /= numOfSamples;
+			if (fhit)
+				shadeResult /= numOfSamples;
+			else
+				shadeResult = Vector3(0.0f, 0.0f, 0.0f);
 			img->setPixel(i, j, shadeResult);
 		}
 		img->drawScanline(j);
@@ -242,10 +250,7 @@ Scene::normalTrace(Camera *cam, Image *img) {
 void
 Scene::raytraceImage(Camera *cam, Image *img)
 {
-	photonTrace(cam, img);
-	Photon *t = &pmap->photons[1];
-	printf("%f\n",t->pos[0]);
-	pmap->balance();
+	buildPhotonMap();
 	normalTrace(cam, img);
     
 }

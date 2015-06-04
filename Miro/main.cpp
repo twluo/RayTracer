@@ -135,7 +135,7 @@ makeTeapotScene()
 	g_image->resize(512, 512);
 
 	// set up the camera
-	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
+	g_camera->setBGColor(Vector3(0.0f, 1.0f, 0.0f));
 	g_camera->setEye(Vector3(-2, 3, 5));
 	g_camera->setLookAt(Vector3(-.5, 1, 0));
 	g_camera->setUp(Vector3(0, 1, 0));
@@ -156,15 +156,20 @@ makeTeapotScene()
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
+	material->setDiffuse(Vector3(0.0f,1.0f,0.0f), 0.2);
+	material->setSpecular(Vector3(1.0f,1.0f,1.0f), 0);
+	material->setAmbient(Vector3(1.0f), 0.05);
 	//material->setRefractionConst(1);
-	//material->setSnellConstant(1.31);
+	material->setSnellConstant(1.31);
 	TriangleMesh * teapot = new TriangleMesh;
 	teapot->load("teapot.obj");
 	addMeshTrianglesToScene(teapot, material);
 
 	// create the floor triangle
 	Material* material1 = new Lambert(Vector3(1.0f,0.0f,0.0f));
-	//material1->setSpecular(Vector3(1.0f), 1);
+	material1->setDiffuse(Vector3(1.0f,0.0f,0.0f), 1);
+	material1->setSpecular(Vector3(1.0f), 0);
+	material1->setAmbient(Vector3(1.0f), 0.05);
 	TriangleMesh * floor = new TriangleMesh;
 	floor->createSingleTriangle();
 	floor->setV1(Vector3(-10, 0, -10));
