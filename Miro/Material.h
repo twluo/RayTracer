@@ -31,6 +31,7 @@ public:
 	float rf; //Specular refracture radiance
     Vector3 m_kd;
     Vector3 m_ks;
+	Vector3 m_ka;
 
 protected:
 };

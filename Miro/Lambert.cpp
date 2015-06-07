@@ -120,7 +120,7 @@ Lambert::shade(const Ray& ray, const HitInfo& hit, const Scene& scene) const
 	L += calcRefraction(r, hi, sc);
 	L += calcReflection(r, hi, sc);
 	//printf("%f\n ", reflection);
-	//L += calcMonteCarlo(r, hi, sc);
+	L += calcMonteCarlo(r, hi, sc);
     return L;
 }
 
@@ -156,10 +156,31 @@ Vector3 Lambert::calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene)
 		r.update();
 		r.times = ray.times + 1;
 		if (scene.trace(hi, r)) {
-			return rd * dot(r.d, hit.N) * hi.material->shade(r, hi, scene);
+			if (dot(r.d, hit.N) >= 0)
+				return rd *m_kd * hi.material->shade(r, hi, scene);
 		}
 		return Vector3(0);
 	}
+}
+Vector3 Lambert::calcPhotonMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene, const Photon_map &pmap) const{
+
+	float *dir = new float[3];
+	float pos[3] = { hit.P.x, hit.P.y, hit.P.z };
+	float norm[3] = { hit.N.x, hit.N.y, hit.N.z };
+	pmap.dir_estimate(dir, pos, norm, .5, 500);
+	Vector3 d = Vector3(dir[0], dir[1], dir[2]);
+	Ray r;
+	r.o = hit.P;
+	r.d = -d;
+	HitInfo hi;
+	if (scene.trace(hi, r)) {
+		float *ir = new float[3];
+		float npos[3] = { hi.P.x, hi.P.y, hi.P.z };
+		float nnor[3] = { hi.N.x, hi.N.y, hi.N.z };
+		pmap.irradiance_estimate(ir, npos, nnor, .5, 500);
+		return Vector3(ir[0], ir[1], ir[2]);
+	}
+	return Vector3(0);
 }
 
 Vector3 Lambert::photonShade(const Ray& ray, const HitInfo& hit,
@@ -200,11 +221,11 @@ Vector3 Lambert::photonShade(const Ray& ray, const HitInfo& hit,
 		//std::cout << L << " " << ira << std::endl;
         //L += std::max(0.0f, powf(dot(viewDir, W_r), 1000)) * rs * color * m_ks;
     }
-    //L += m_ka * ra;
-    //L += calcRefraction(r, hi, sc);
+    L += m_ka * ra;
+    L += calcRefraction(ray, hit, scene);
     L += calcPhotonReflection(ray, hit, scene, pmap);
     //printf("%f\n ", reflection);
-    //L += calcMonteCarlo(r, hi, sc);
+    //L += calcPhotonMonteCarlo(ray, hit, scene, pmap);
     return L;
 }
 

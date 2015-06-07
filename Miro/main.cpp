@@ -59,27 +59,37 @@ makeSpiralScene()
 }
 
 
+
+// local helper function declarations
+namespace
+{
+	void addMeshTrianglesToScene(TriangleMesh * mesh, Material * material);
+	inline Matrix4x4 translate(float x, float y, float z);
+	inline Matrix4x4 scale(float x, float y, float z);
+	inline Matrix4x4 rotate(float angle, float x, float y, float z);
+} // namespace
+
 void
 makeCornellScene()
 {
-    g_camera = new Camera;
-    g_scene = new Scene;
-    g_image = new Image;
+	g_camera = new Camera;
+	g_scene = new Scene;
+	g_image = new Image;
 
 	g_image->resize(512, 512);
-    
-    // set up the camera
-    g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
-    g_camera->setEye(Vector3(2.75, 3, 8));
-    g_camera->setLookAt(Vector3(2.75, 2.75, -2.75));
-    g_camera->setUp(Vector3(0, 1, 0));
-    g_camera->setFOV(45);
 
-    // create and place a point light source
-    PointLight * light = new PointLight;
-    light->setPosition(Vector3(2.75, 5.4, -2.75));
-    light->setColor(Vector3(1, 1, 1));
-    light->setWattage(50);
+	// set up the camera
+	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
+	g_camera->setEye(Vector3(2.75, 3, 8));
+	g_camera->setLookAt(Vector3(2.75, 2.75, -2.75));
+	g_camera->setUp(Vector3(0, 1, 0));
+	g_camera->setFOV(45);
+
+	// create and place a point light source
+	PointLight * light = new PointLight;
+	light->setPosition(Vector3(2.75, 5.4, -2.75));
+	light->setColor(Vector3(1, 1, 1));
+	light->setWattage(50);
 	g_scene->addLight(light);
 
 	Material* wmat = new Lambert();
@@ -91,40 +101,56 @@ makeCornellScene()
 	Material* gmat = new Lambert();
 	gmat->setDiffuse(Vector3(0, 1, 0), 1);
 
-    TriangleMesh * bunny = new TriangleMesh;
+	Material* mirror = new Lambert();
+	mirror->setDiffuse(Vector3(0, 0, 0), 0);
+	mirror->setSpecular(Vector3(1, 1, 1), 1);
+	mirror->setReflectionConst(1);
 
-    bunny->load("cornell_box.obj");
-   
-    // create all the triangles in the bunny mesh and add to the scene
-    for (int i = 0; i < bunny->numTris(); ++i)
-    {
-        Triangle* t = new Triangle;
-        t->setIndex(i);
+	TriangleMesh * bunny = new TriangleMesh;
+
+	bunny->load("cornell_box.obj");
+
+	// create all the triangles in the bunny mesh and add to the scene
+	for (int i = 0; i < 16; ++i)
+	{
+		Triangle* t = new Triangle;
+		t->setIndex(i);
 		t->setMesh(bunny);
 		if (i >= 4 && i < 6)
 			t->setMaterial(rmat);
 		else if (i >= 6 && i < 8)
 			t->setMaterial(gmat);
+		else if (i >= 16 && i < 27)
+			t->setMaterial(mirror);
+		else if (i >= 27)
+			t->setMaterial(mirror);
 		else
 			t->setMaterial(wmat);
 		t->calculateCenteroid();
-        g_scene->addObject(t);
-    }
-     
-    // let objects do pre-calculations if needed
-    g_scene->preCalc();
+		g_scene->addObject(t);
+	}
+
+	Matrix4x4 xform;
+	xform *= translate(2, 1, -1);
+	Sphere* greenSphere = new Sphere;
+	greenSphere->setCenter(Vector3(0.75, 2, -2.75));
+	greenSphere->setRadius(0.75);
+	greenSphere->setMaterial(gmat);
+	g_scene->addObject(greenSphere);
+	Sphere* mirrorSphere = new Sphere;
+	mirrorSphere->setCenter(Vector3(2.75, 2, -2.75));
+	mirrorSphere->setRadius(0.75);
+	mirrorSphere->setMaterial(mirror);
+	g_scene->addObject(mirrorSphere);
+	Sphere* redSphere = new Sphere;
+	redSphere->setCenter(Vector3(4.75, 2, -2.75));
+	redSphere->setRadius(0.75);
+	redSphere->setMaterial(rmat);
+	g_scene->addObject(redSphere);
+	// let objects do pre-calculations if needed
+	g_scene->preCalc();
 	g_scene->setSampleRate(16);
 }
-// local helper function declarations
-namespace
-{
-	void addMeshTrianglesToScene(TriangleMesh * mesh, Material * material);
-	inline Matrix4x4 translate(float x, float y, float z);
-	inline Matrix4x4 scale(float x, float y, float z);
-	inline Matrix4x4 rotate(float angle, float x, float y, float z);
-} // namespace
-
-
 void
 makeTeapotScene()
 {
@@ -156,13 +182,15 @@ makeTeapotScene()
 	g_scene->addLight(light);
 
 	Material* material = new Lambert(Vector3(1.0f));
-	material->setDiffuse(Vector3(0.0f,1.0f,0.0f), 1);
-	material->setSpecular(Vector3(1.0f,1.0f,1.0f), 0);
-	material->setAmbient(Vector3(1.0f), 0.05);
-	//material->setRefractionConst(1);
+	material->setDiffuse(Vector3(0.0f,0.0f,0.0f), 0);
+	material->setSpecular(Vector3(1.0f,1.0f,1.0f), 1);
+	material->setAmbient(Vector3(0.0f), 0.05);
+	material->setRefractionConst(1);
 	material->setSnellConstant(1.31);
+	Matrix4x4 xform;
+	xform *= translate(0, 1, 0);
 	TriangleMesh * teapot = new TriangleMesh;
-	teapot->load("teapot.obj");
+	teapot->load("sphere.obj", xform);
 	addMeshTrianglesToScene(teapot, material);
 
 	// create the floor triangle

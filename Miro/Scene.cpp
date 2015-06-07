@@ -4,6 +4,7 @@
 #include "Image.h"
 #include "Console.h"
 #include <ctime>
+#include <algorithm>
 
 #define PNUM 2000000
 #define IPNUM 1/PNUM
@@ -148,9 +149,11 @@ Scene::buildPhotonMap() {
 					float pow[3] = { r.power.x, r.power.y, r.power.z };
 					pmap->store(pow, pos, dir);
 					stored++;
-					float rd = hit.material->rd;
-					float rs = hit.material->rs;
-					float rf = hit.material->rf;
+					Vector3 k_d = hit.material->m_kd;
+					Vector3 k_s = hit.material->m_ks;
+
+					float rs = std::max(k_d.x * k_s.x, std::max(k_d.y * k_s.y, k_d.z * k_s.z));
+					float rd = (k_d.x + k_d.y + k_d.z) / (k_d.x + k_d.y + k_d.z + k_s.x + k_s.y + k_s.z) * rs;
 					float ran = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 					if (ran < rd) {
 						//printf("DIFFUSED\n");
@@ -175,7 +178,7 @@ Scene::buildPhotonMap() {
 		}
 	}
 	clock_t temp = clock() - t;
-	printf("Time Elapsed: (%f seconds)./n", ((float)temp) / CLOCKS_PER_SEC);
+	printf("Time Elapsed: (%f seconds).\n", ((float)temp) / CLOCKS_PER_SEC);
 
 	float scale = pnum;
 	scale = 1 / scale;

@@ -27,6 +27,8 @@ public:
 	Vector3 calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcPhotonReflection(const Ray &ray, const HitInfo &hit, Scene scene,
 		const Photon_map& pmap) const;
+	Vector3 calcPhotonMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene,
+		const Photon_map& pmap) const;
     const Vector3 & kd() const { return m_kd; }
 	const Vector3 & ka() const { return m_ka; }
 	float snell;
@@ -40,12 +42,7 @@ public:
 		const Scene& scene) const;
     virtual Vector3 photonShade(const Ray& ray, const HitInfo& hit,
         const Scene& scene, const Photon_map& pmap) const;
-	float rd; //Diffuse radiance
-	float rs; //Specular reflectance radiance
-	float rf;//Specular refracture radiance
 
-    Vector3 m_kd;
-    Vector3 m_ks;
 protected:
     Vector3 m_ka;
     float noise;

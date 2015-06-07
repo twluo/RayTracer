@@ -43,6 +43,8 @@ Photon_map :: ~Photon_map()
 {
 	free(photons);
 }
+
+//Draw Function
 void Photon_map::draw() {
 	glBegin(GL_POINTS);
 	glPointSize(2);
@@ -64,7 +66,58 @@ void Photon_map::photon_dir(float *dir, const Photon *p) const
 	dir[2] = costheta[p->theta];
 }
 
+void Photon_map::dir_estimate(
+	float dir[3],                // returned irradiance
+	const float pos[3],            // surface position
+	const float normal[3],         // surface normal at pos
+	const float max_dist,          // max distance to look for photons
+	const int nphotons) const     // number of photons to use
+	//**********************************************
+{
+	dir[0] = dir[1] = dir[2] = 0.0;
 
+	NearestPhotons np;
+	np.dist2 = (float*)alloca(sizeof(float)*(nphotons + 1));
+	np.index = (const Photon**)alloca(sizeof(Photon*)*(nphotons + 1));
+
+	np.pos[0] = pos[0]; np.pos[1] = pos[1]; np.pos[2] = pos[2];
+	np.max = nphotons;
+	np.found = 0;
+	np.got_heap = 0;
+	np.dist2[0] = max_dist*max_dist;
+
+	// locate the nearest photons
+	locate_photons(&np, 1);
+	//fprintf(stderr, "NP: %f\n", np.pos[0]);
+
+	// if less than 8 photons return
+	if (np.found<8)
+		//fprintf(stderr, "LESS THAN 8\n");
+
+		return;
+
+	float pdir[3];
+
+	unsigned char t = 0;
+	unsigned char p = 0;
+	// sum irradiance from all photons
+	for (int i = 1; i <= np.found; i++) {
+		const Photon *p = np.index[i];
+		// the photon_dir call and following if can be omitted (for speed)
+		// if the scene does not have any thin surfaces
+		photon_dir(pdir, p);
+		if ((pdir[0] * normal[0] + pdir[1] * normal[1] + pdir[2] * normal[2]) < 0.0f) {
+			t += p->theta;
+			p += p->phi;
+		}
+	}
+
+	t /= np.found;
+	p /= np.found; 
+	dir[0] = sintheta[t] * cosphi[p];
+	dir[1] = sintheta[t] * sinphi[p];
+	dir[2] = costheta[t];
+}
 /* irradiance_estimate computes an irradiance estimate
 * at a given surface position
 */

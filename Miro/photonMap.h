@@ -49,7 +49,13 @@ class Photon_map {
 //*****************
 public:
 	Photon_map(int max_phot);
-	~Photon_map();
+	~Photon_map(); 
+	void dir_estimate(
+		float irrad[3],                // returned irradiance
+		const float pos[3],            // surface position
+		const float normal[3],         // surface normal at pos
+		const float max_dist,          // max distance to look for photons
+		const int nphotons) const;    // number of photons to use
 
 	void store(
 		const float power[3],          // photon power
