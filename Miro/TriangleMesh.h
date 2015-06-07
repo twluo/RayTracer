@@ -37,6 +37,17 @@ public:
     TupleI3* nIndices()     {return m_normalIndices;}
     int numTris()           {return m_numTris;}
 
+    void move(Vector3 moveLoc){
+        Matrix4x4 translation;
+        translation.m11 = moveLoc.x;
+        translation.m22 = moveLoc.y;
+        translation.m33 = moveLoc.z;
+
+        for (int i = 0; i < m_vertices->length(); i++){
+            m_vertices[i] = translation * m_vertices[i];
+        }
+    }
+
 protected:
     void loadObj(FILE* fp, const Matrix4x4& ctm);
 
