@@ -17,18 +17,23 @@ public:
 	virtual void setAmbient(const Vector3 &ka, float ra);
 	virtual void setDiffuse(const Vector3 &kd, float rd);
 	virtual void setSpecular(const Vector3 &ks, float r);
-	virtual void setReflectionConst(float rf);
-	virtual void setRefractionConst(float rf);
-	virtual void setSnellConstant(float snell);
+	virtual void setTransmission(float rf, float snell);
 	virtual void setPattern(float noise);
 	virtual void setConstant(float rd, float rs, float rf);
+	virtual void setRefle();
+	virtual void setRefra(float rf, float snell);
 	Vector3 calcReflection(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcRefraction(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene) const;
 	Vector3 calcPhotonReflection(const Ray &ray, const HitInfo &hit, Scene scene,
 		const Photon_map& pmap) const;
+	Vector3 calcPhotonRefraction(const Ray &ray, const HitInfo &hit, Scene scene,
+		const Photon_map& pmap) const;
 	Vector3 calcPhotonMonteCarlo(const Ray &ray, const HitInfo &hit, Scene scene,
 		const Photon_map& pmap) const;
+	Vector3 fresnell(const Ray &ray, const HitInfo &hit, Scene scene,
+		const Photon_map& pmap) const;
+
     const Vector3 & kd() const { return m_kd; }
 	const Vector3 & ka() const { return m_ka; }
 	float snell;
@@ -47,8 +52,9 @@ protected:
     Vector3 m_ka;
     float noise;
 	float ra;
-	bool refra;
+	bool trans;
 	bool refle;
+	bool refra;
 };
 
 #endif // CSE168_LAMBERT_H_INCLUDED

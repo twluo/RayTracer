@@ -14,7 +14,10 @@ public:
     void setRadius(const float f)       {m_radius = f;}
 
     const Vector3& center() const       {return m_center;}
-    float radius() const                {return m_radius;}
+	float radius() const                { return m_radius; }
+	virtual Vector3 getCenteroid() { return m_center; }
+	virtual Vector3 getMax() { return m_center + m_radius; }
+	virtual Vector3 getMin() { return m_center - m_radius; }
 
     virtual void renderGL();
     virtual bool intersect(HitInfo& result, const Ray& ray,

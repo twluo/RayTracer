@@ -80,20 +80,28 @@ makeCornellScene()
 
 	// set up the camera
 	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
-	g_camera->setEye(Vector3(2.75, 3, 8));
+	g_camera->setEye(Vector3(2.75, 2.75, 8));
 	g_camera->setLookAt(Vector3(2.75, 2.75, -2.75));
 	g_camera->setUp(Vector3(0, 1, 0));
 	g_camera->setFOV(45);
+	g_camera->setASize(0.25);
+	g_camera->setFDist(10.75);
 
 	// create and place a point light source
 	PointLight * light = new PointLight;
 	light->setPosition(Vector3(2.75, 5.4, -2.75));
 	light->setColor(Vector3(1, 1, 1));
-	light->setWattage(50);
+	light->setWattage(100);
 	g_scene->addLight(light);
 
 	Material* wmat = new Lambert();
 	wmat->setDiffuse(Vector3(1, 1, 1), 1);
+	
+	Material* bmat = new Lambert();
+	bmat->setDiffuse(Vector3(0, 0, 1), 1);
+
+	Material* rgmat = new Lambert();
+	rgmat->setDiffuse(Vector3(1, 1, 0), 1);
 
 	Material* rmat = new Lambert();
 	rmat->setDiffuse(Vector3(1, 0, 0), 1);
@@ -101,16 +109,22 @@ makeCornellScene()
 	Material* gmat = new Lambert();
 	gmat->setDiffuse(Vector3(0, 1, 0), 1);
 
+	Material* glass = new Lambert();
+	glass->setDiffuse(Vector3(0, 0, 0), 0);
+	glass->setSpecular(Vector3(1, 1, 1), 1);
+	glass->setRefra(1, 1.33);
+
 	Material* mirror = new Lambert();
 	mirror->setDiffuse(Vector3(0, 0, 0), 0);
 	mirror->setSpecular(Vector3(1, 1, 1), 1);
-	mirror->setReflectionConst(1);
+	mirror->setRefle();
 
 	TriangleMesh * bunny = new TriangleMesh;
 
 	bunny->load("cornell_box.obj");
 
 	// create all the triangles in the bunny mesh and add to the scene
+	//for (int i = 0; i < bunny->numTris; ++i)
 	for (int i = 0; i < 16; ++i)
 	{
 		Triangle* t = new Triangle;
@@ -121,35 +135,117 @@ makeCornellScene()
 		else if (i >= 6 && i < 8)
 			t->setMaterial(gmat);
 		else if (i >= 16 && i < 27)
-			t->setMaterial(mirror);
+			t->setMaterial(wmat);
 		else if (i >= 27)
-			t->setMaterial(mirror);
+			t->setMaterial(wmat);
 		else
 			t->setMaterial(wmat);
 		t->calculateCenteroid();
 		g_scene->addObject(t);
 	}
 
-	Matrix4x4 xform;
-	xform *= translate(2, 1, -1);
-	Sphere* greenSphere = new Sphere;
-	greenSphere->setCenter(Vector3(0.75, 2, -2.75));
+	
+	/*Sphere* greenSphere = new Sphere;
+	greenSphere->setCenter(Vector3(1.75, 2.75, -3.75));
 	greenSphere->setRadius(0.75);
 	greenSphere->setMaterial(gmat);
 	g_scene->addObject(greenSphere);
 	Sphere* mirrorSphere = new Sphere;
-	mirrorSphere->setCenter(Vector3(2.75, 2, -2.75));
+	mirrorSphere->setCenter(Vector3(2.75, 2.75, 1.75));
+	mirrorSphere->setRadius(1);
+	mirrorSphere->setMaterial(glass);
+	g_scene->addObject(mirrorSphere);
+	Sphere* redSphere = new Sphere;
+	redSphere->setCenter(Vector3(3.75, 2.75, -3.75));
+	redSphere->setRadius(0.75);
+	redSphere->setMaterial(rmat);
+	g_scene->addObject(redSphere); 
+	Sphere* metalSphere = new Sphere;
+	metalSphere->setCenter(Vector3(5.5, 5.5, -5.5));
+	metalSphere->setRadius(1);
+	metalSphere->setMaterial(mirror);
+	g_scene->addObject(metalSphere);
+	Sphere* metalSphere1 = new Sphere;
+	metalSphere1->setCenter(Vector3(0, 5.5, -5.5));
+	metalSphere1->setRadius(1);
+	metalSphere1->setMaterial(mirror);
+	g_scene->addObject(metalSphere1);
+	Sphere* metalSphere2 = new Sphere;
+	metalSphere2->setCenter(Vector3(5.5, 0, -5.5));
+	metalSphere2->setRadius(1);
+	metalSphere2->setMaterial(mirror);
+	g_scene->addObject(metalSphere2);
+	Sphere* metalSphere3 = new Sphere;
+	metalSphere3->setCenter(Vector3(0, 0, -5.5));
+	metalSphere3->setRadius(1);
+	metalSphere3->setMaterial(mirror);
+	g_scene->addObject(metalSphere3);*/
+	// let objects do pre-calculations if needed
+
+	/*Sphere* sphere1 = new Sphere;
+	sphere1->setCenter(Vector3(0.35, 0.35, -0.35));
+	sphere1->setRadius(0.1);
+	sphere1->setMaterial(glass);
+	g_scene->addObject(sphere1);
+	Sphere* sphere2 = new Sphere;
+	sphere2->setCenter(Vector3(0.65, 0.65, -0.65));
+	sphere2->setRadius(0.2);
+	sphere2->setMaterial(glass);
+	g_scene->addObject(sphere2);
+	Sphere* sphere3 = new Sphere;
+	sphere3->setCenter(Vector3(1.15, 1.15, -1.15));
+	sphere3->setRadius(0.3);
+	sphere3->setMaterial(gmat);
+	g_scene->addObject(sphere3);
+	Sphere* sphere4 = new Sphere;
+	sphere4->setCenter(Vector3(1.85, 1.85, -1.85));
+	sphere4->setRadius(0.4);
+	sphere4->setMaterial(gmat);
+	g_scene->addObject(sphere4);
+	Sphere* sphere5 = new Sphere;
+	sphere5->setCenter(Vector3(2.75, 2.75, -2.75));
+	sphere5->setRadius(0.5);
+	sphere5->setMaterial(mirror);
+	g_scene->addObject(sphere5); 
+	Sphere* sphere6 = new Sphere;
+	sphere6->setCenter(Vector3(3.65, 3.65, -3.65));
+	sphere6->setRadius(0.4);
+	sphere6->setMaterial(rmat);
+	g_scene->addObject(sphere6);
+	Sphere* sphere7 = new Sphere;
+	sphere7->setCenter(Vector3(4.35, 4.35, -4.35));
+	sphere7->setRadius(0.3);
+	sphere7->setMaterial(rmat);
+	g_scene->addObject(sphere7);
+	Sphere* sphere8 = new Sphere;
+	sphere8->setCenter(Vector3(4.85, 4.85, -4.85));
+	sphere8->setRadius(0.2);
+	sphere8->setMaterial(glass);
+	g_scene->addObject(sphere8);
+	Sphere* sphere9 = new Sphere;
+	sphere9->setCenter(Vector3(5.15, 5.15, -5.15));
+	sphere9->setRadius(0.1);
+	sphere9->setMaterial(glass);
+	g_scene->addObject(sphere9);*/
+
+	Sphere* glassSphere = new Sphere;
+	glassSphere->setCenter(Vector3(1, 1, -0.75));
+	glassSphere->setRadius(0.75);
+	glassSphere->setMaterial(glass);
+	g_scene->addObject(glassSphere);
+	Sphere* mirrorSphere = new Sphere;
+	mirrorSphere->setCenter(Vector3(2.75, 1, -2.75));
 	mirrorSphere->setRadius(0.75);
 	mirrorSphere->setMaterial(mirror);
 	g_scene->addObject(mirrorSphere);
-	Sphere* redSphere = new Sphere;
-	redSphere->setCenter(Vector3(4.75, 2, -2.75));
-	redSphere->setRadius(0.75);
-	redSphere->setMaterial(rmat);
-	g_scene->addObject(redSphere);
-	// let objects do pre-calculations if needed
+	Sphere* diffuseSphere = new Sphere;
+	diffuseSphere->setCenter(Vector3(4.50, 1, -4.75));
+	diffuseSphere->setRadius(0.75);
+	diffuseSphere->setMaterial(bmat);
+	g_scene->addObject(diffuseSphere);
+
 	g_scene->preCalc();
-	g_scene->setSampleRate(16);
+	g_scene->setSampleRate(1000);
 }
 void
 makeTeapotScene()
@@ -185,13 +281,18 @@ makeTeapotScene()
 	material->setDiffuse(Vector3(0.0f,0.0f,0.0f), 0);
 	material->setSpecular(Vector3(1.0f,1.0f,1.0f), 1);
 	material->setAmbient(Vector3(0.0f), 0.05);
-	material->setRefractionConst(1);
-	material->setSnellConstant(1.31);
-	Matrix4x4 xform;
-	xform *= translate(0, 1, 0);
+	material->setRefra(1, 1.33);
+	/*Matrix4x4 xmat;
+	xmat *= scale(0.5, 0.5, 0.5); 
 	TriangleMesh * teapot = new TriangleMesh;
-	teapot->load("sphere.obj", xform);
-	addMeshTrianglesToScene(teapot, material);
+	teapot->load("bear.obj", xmat);
+	addMeshTrianglesToScene(teapot, material);*/
+
+	Sphere* mirrorSphere = new Sphere;
+	mirrorSphere->setCenter(Vector3(2.75, 2, -2.75));
+	mirrorSphere->setRadius(0.75);
+	mirrorSphere->setMaterial(material);
+	g_scene->addObject(mirrorSphere);
 
 	// create the floor triangle
 	Material* material1 = new Lambert(Vector3(1.0f,0.0f,0.0f));

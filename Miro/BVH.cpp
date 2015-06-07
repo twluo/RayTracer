@@ -116,7 +116,7 @@ BVH::build(Objects * objs)
 	
 	bbox = box(bmin, bmax);
 
-	if (m_objects->size() < 9) {
+	if (m_objects->size() < 10) {
 		leaf = true;
 		return;
 	}

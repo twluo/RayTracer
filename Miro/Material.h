@@ -16,15 +16,16 @@ public:
 	virtual void setDiffuse(const Vector3 &kd, float rd) {}
 	virtual void setSpecular(const Vector3 &ks, float r) {}
 	virtual void setConstant(float rd, float rs, float rf) {}
-	virtual void setReflectionConst(float rf) {}
-	virtual void setRefractionConst(float rf) {}
-	virtual void setSnellConstant(float snell) {}
+	virtual void setRefle() {}
+	virtual void setRefra(float rf, float snell) {}
+	virtual void setTransmission(float rf, float snell) {};
 	virtual void setPattern(float noise) {}
 
     virtual Vector3 shade(const Ray& ray, const HitInfo& hit,
 		const Scene& scene) const;
     virtual Vector3 photonShade(const Ray& ray, const HitInfo& hit,
         const Scene& scene, const Photon_map &pmap) const;
+
 	float snell;
 	float rd; //Diffuse radiance
 	float rs; //Specular reflectance radiance

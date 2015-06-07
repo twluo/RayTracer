@@ -28,6 +28,7 @@ public:
 		float tMin = 0.0f, float tMax = MIRO_TMAX) ;
 	void setSampleRate(int i) { numOfSamples = i; }
 	void toggleDraw() { draw = !draw; }
+	void togglePDraw() { pmapd = !pmapd; }
 	Ray getReflectedRay(HitInfo minHit, Ray ray);
 	Ray getRefractedRay(HitInfo minHit, Ray ray);
 	Ray getDiffusedRay(HitInfo minHit, Ray ray);
@@ -35,6 +36,8 @@ public:
 
 protected:
 	Photon_map *pmap;
+	Photon_map *cmap;
+	bool pmapd;
 	bool draw;
 	int numOfSamples;
     Objects m_objects;

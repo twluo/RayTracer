@@ -160,10 +160,53 @@ Camera::randomRay(int x, int y, int imageWidth, int imageHeight)
 	//srand(time(NULL));
 	// transform x and y into camera space 
 	// -----------------------------------
-	float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX)* 2 - 1;
+	float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX)* 2 - 1;
 	const float imPlaneUPos = left + (right - left)*(((float)x + rx) / (float)imageWidth);
 	const float imPlaneVPos = bottom + (top - bottom)*(((float)y + ry) / (float)imageHeight);
 
 	return Ray(m_eye, (imPlaneUPos*uDir + imPlaneVPos*vDir - wDir).normalize());
+}
+
+Ray
+Camera::randomFOVRay(int x, int y, int imageWidth, int imageHeight)
+{
+	// first compute the camera coordinate system 
+	// ------------------------------------------
+
+	// wDir = e - (e+m_viewDir) = -m_vView
+	const Vector3 wDir = Vector3(-m_viewDir).normalize();
+	const Vector3 uDir = cross(m_up, wDir).normalize();
+	const Vector3 vDir = cross(wDir, uDir);
+
+
+
+	// next find the corners of the image plane in camera space
+	// --------------------------------------------------------
+
+	const float aspectRatio = (float)imageWidth / (float)imageHeight;
+
+
+	const float top = tan(m_fov*HalfDegToRad);
+	const float right = aspectRatio*top;
+
+	const float bottom = -top;
+	const float left = -right;
+
+
+
+	//srand(time(NULL));
+	// transform x and y into camera space 
+	// -----------------------------------
+	float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 - 1;
+	float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 - 1;
+	rx *= asize;
+	ry *= asize;
+	const float imPlaneUPos = left + (right - left)*(((float)x + 0.5) / (float)imageWidth);
+	const float imPlaneVPos = bottom + (top - bottom)*(((float)y + 0.5) / (float)imageHeight);
+	Vector3 dir = imPlaneUPos*uDir + imPlaneVPos*vDir - wDir;
+	dir *= fdist;
+	dir -= Vector3(rx, ry, 0);
+	Vector3 pos = m_eye + Vector3(rx, ry, 0);
+	return Ray(pos, dir.normalize());
 }

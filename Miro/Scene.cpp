@@ -6,7 +6,8 @@
 #include <ctime>
 #include <algorithm>
 
-#define PNUM 2000000
+#define PNUM 1000000
+//10000000
 #define IPNUM 1/PNUM
 #define EPSILON 0.0001
 
@@ -52,8 +53,9 @@ Scene::preCalc()
 	int leafCount = 0;
 	int nodeCount = 0;
 	m_bvh.count(leafCount, nodeCount); 
-	buildPhotonMap();
 	std::cout << "number of leaf is " << leafCount << " and number of nodes is " << nodeCount << std::endl;
+	buildPhotonMap();
+	
 }
 
 Ray Scene::getReflectedRay(HitInfo hit, Ray ray) {
@@ -123,6 +125,7 @@ Scene::buildPhotonMap() {
 	int pnum = 0;
 	clock_t t;
 	t = clock();
+
 	for (lightIter = lightlist->begin(); lightIter != lightlist->end(); lightIter++) {
 		int stored = 0;
 		while (stored <= PNUM) {
@@ -153,19 +156,19 @@ Scene::buildPhotonMap() {
 					Vector3 k_s = hit.material->m_ks;
 
 					float rs = std::max(k_d.x * k_s.x, std::max(k_d.y * k_s.y, k_d.z * k_s.z));
-					float rd = (k_d.x + k_d.y + k_d.z) / (k_d.x + k_d.y + k_d.z + k_s.x + k_s.y + k_s.z) * rs;
+					float rd = (k_d.x + k_d.y + k_d.z) / (k_d.x + k_d.y + k_d.z + k_s.x + k_s.y + k_s.z);
 					float ran = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 					if (ran < rd) {
 						//printf("DIFFUSED\n");
 						Ray nr = getDiffusedRay(hit, r);
 						r = nr;
-						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_kd / PI * hit.material->rd;
+						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_kd;
 					}
 					else if (ran < rd + rs) {
 						//printf("REFLECTED\n");
 						Ray nr = getReflectedRay(hit, r);
 						r = nr;
-						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_ks / PI * hit.material->rs;
+						r.power = Vector3(pow[0], pow[1], pow[2]) * hit.material->m_ks;
 					}
 					else {
 						//printf("ABSORBED\n");
@@ -178,12 +181,15 @@ Scene::buildPhotonMap() {
 		}
 	}
 	clock_t temp = clock() - t;
-	printf("Time Elapsed: (%f seconds).\n", ((float)temp) / CLOCKS_PER_SEC);
+	printf("Done emitting photons, Time Elapsed: (%f seconds).\n", ((float)temp) / CLOCKS_PER_SEC);
 
+	t = clock();
 	float scale = pnum;
 	scale = 1 / scale;
 	pmap->scale_photon_power(scale);
 	pmap->balance();
+	temp = clock() - t;
+	printf("Done Balancing, Time Elapsed: (%f seconds).\n", ((float)temp) / CLOCKS_PER_SEC);
 }
 
 void
@@ -280,10 +286,11 @@ Scene::photonTrace(Camera *cam, Image *img){
             HitInfo altHitInfo;
             shadeResult = Vector3(0);
             for (int k = 0; k < numOfSamples; k++) {
-                if (k == 0)
-                    ray = cam->eyeRay(i, j, img->width(), img->height());
-                else
-                    ray = cam->randomRay(i, j, img->width(), img->height());
+				//if (k == 0)
+                   // ray = cam->eyeRay(i, j, img->width(), img->height());
+                //else
+                    //ray = cam->randomRay(i, j, img->width(), img->height());
+				ray = cam->randomFOVRay(i, j, img->width(), img->height());
                 rayCount++;
                 if (trace(hitInfo, ray))
                 {
@@ -339,8 +346,8 @@ void
 Scene::raytraceImage(Camera *cam, Image *img)
 {
 	
-	normalTrace(cam, img);
-    //photonTrace(cam, img);
+	//normalTrace(cam, img);
+    photonTrace(cam, img);
     
 }
 

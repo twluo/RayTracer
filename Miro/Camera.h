@@ -33,6 +33,9 @@ public:
     inline void setBGColor(float x, float y, float z);
     inline void setBGColor(const Vector3& color);
     inline void setFOV(float fov) {m_fov = fov;}
+	inline void setFDist(float f) { fdist = f; };
+	inline void setASize(float s) { asize = s; };
+	
 
     inline float fov() const                {return m_fov;}
     inline const Vector3 & viewDir() const  {return m_viewDir;}
@@ -43,6 +46,7 @@ public:
 
 	Ray eyeRay(int x, int y, int imageWidth, int imageHeight);
 	Ray randomRay(int x, int y, int imageWidth, int imageHeight);
+	Ray randomFOVRay(int x, int y, int imageWidth, int imageHeight);
     
     void drawGL();
 
@@ -59,6 +63,8 @@ private:
     Vector3 m_viewDir;
     Vector3 m_lookAt;
     float m_fov;
+	float fdist;
+	float asize;
 };
 
 extern Camera * g_camera;

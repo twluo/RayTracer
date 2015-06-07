@@ -50,6 +50,7 @@ void Photon_map::draw() {
 	glPointSize(2);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < stored_photons; i++) {
+		//glColor3f(photons[i].power[0], photons[i].power[1], photons[i].power[2]);
 		glVertex3f(photons[i].pos[0], photons[i].pos[1], photons[i].pos[2]);
 	}
 	glEnd();
