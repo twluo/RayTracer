@@ -76,7 +76,7 @@ makeCornellScene()
 	g_scene = new Scene;
 	g_image = new Image;
 
-	g_image->resize(512, 512);
+	g_image->resize(1024, 1024);
 
 	// set up the camera
 	g_camera->setBGColor(Vector3(0.0f, 0.0f, 0.2f));
@@ -91,8 +91,15 @@ makeCornellScene()
 	PointLight * light = new PointLight;
 	light->setPosition(Vector3(2.75, 5.4, -2.75));
 	light->setColor(Vector3(1, 1, 1));
-	light->setWattage(100);
+	light->setWattage(200);
 	g_scene->addLight(light);
+
+
+	PointLight * light1 = new PointLight;
+	light1->setPosition(Vector3(2.75, 2, 1));
+	light1->setColor(Vector3(1, 1, 1));
+	light1->setWattage(150);
+	g_scene->addLight(light1);
 
 	Material* wmat = new Lambert();
 	wmat->setDiffuse(Vector3(1, 1, 1), 1);
@@ -159,7 +166,7 @@ makeCornellScene()
 	redSphere->setCenter(Vector3(3.75, 2.75, -3.75));
 	redSphere->setRadius(0.75);
 	redSphere->setMaterial(rmat);
-	g_scene->addObject(redSphere); 
+	g_scene->addObject(redSphere); */
 	Sphere* metalSphere = new Sphere;
 	metalSphere->setCenter(Vector3(5.5, 5.5, -5.5));
 	metalSphere->setRadius(1);
@@ -170,7 +177,7 @@ makeCornellScene()
 	metalSphere1->setRadius(1);
 	metalSphere1->setMaterial(mirror);
 	g_scene->addObject(metalSphere1);
-	Sphere* metalSphere2 = new Sphere;
+	/*Sphere* metalSphere2 = new Sphere;
 	metalSphere2->setCenter(Vector3(5.5, 0, -5.5));
 	metalSphere2->setRadius(1);
 	metalSphere2->setMaterial(mirror);
@@ -185,12 +192,12 @@ makeCornellScene()
 	/*Sphere* sphere1 = new Sphere;
 	sphere1->setCenter(Vector3(0.35, 0.35, -0.35));
 	sphere1->setRadius(0.1);
-	sphere1->setMaterial(glass);
+	sphere1->setMaterial(gmat);
 	g_scene->addObject(sphere1);
 	Sphere* sphere2 = new Sphere;
 	sphere2->setCenter(Vector3(0.65, 0.65, -0.65));
 	sphere2->setRadius(0.2);
-	sphere2->setMaterial(glass);
+	sphere2->setMaterial(gmat);
 	g_scene->addObject(sphere2);
 	Sphere* sphere3 = new Sphere;
 	sphere3->setCenter(Vector3(1.15, 1.15, -1.15));
@@ -206,7 +213,7 @@ makeCornellScene()
 	sphere5->setCenter(Vector3(2.75, 2.75, -2.75));
 	sphere5->setRadius(0.5);
 	sphere5->setMaterial(mirror);
-	g_scene->addObject(sphere5); 
+	g_scene->addObject(sphere5);
 	Sphere* sphere6 = new Sphere;
 	sphere6->setCenter(Vector3(3.65, 3.65, -3.65));
 	sphere6->setRadius(0.4);
@@ -220,32 +227,51 @@ makeCornellScene()
 	Sphere* sphere8 = new Sphere;
 	sphere8->setCenter(Vector3(4.85, 4.85, -4.85));
 	sphere8->setRadius(0.2);
-	sphere8->setMaterial(glass);
+	sphere8->setMaterial(rmat);
 	g_scene->addObject(sphere8);
 	Sphere* sphere9 = new Sphere;
 	sphere9->setCenter(Vector3(5.15, 5.15, -5.15));
 	sphere9->setRadius(0.1);
-	sphere9->setMaterial(glass);
+	sphere9->setMaterial(rmat);
 	g_scene->addObject(sphere9);*/
 
+	
+	const int maxI = 2000;
+	const float a = 0.15f;
+	for (int i = 1; i < maxI; ++i)
+	{
+		float t = i / float(maxI);
+		float theta = 4 * PI*t;
+		float r = a*theta;
+		float x = r*cos(theta);
+		float y = r*sin(theta);
+		x += 2.75;
+		y += 3.5;
+		float z = -3.25;
+		Sphere * sphere = new Sphere;
+		sphere->setCenter(Vector3(x, y, z));
+		sphere->setRadius(r / 10);
+		sphere->setMaterial(mirror);
+		g_scene->addObject(sphere);
+	}
 	Sphere* glassSphere = new Sphere;
-	glassSphere->setCenter(Vector3(1, 1, -0.75));
+	glassSphere->setCenter(Vector3(1, 1, -1.75));
 	glassSphere->setRadius(0.75);
 	glassSphere->setMaterial(glass);
 	g_scene->addObject(glassSphere);
 	Sphere* mirrorSphere = new Sphere;
-	mirrorSphere->setCenter(Vector3(2.75, 1, -2.75));
+	mirrorSphere->setCenter(Vector3(2.75, 1, -1.75));
 	mirrorSphere->setRadius(0.75);
 	mirrorSphere->setMaterial(mirror);
 	g_scene->addObject(mirrorSphere);
 	Sphere* diffuseSphere = new Sphere;
-	diffuseSphere->setCenter(Vector3(4.50, 1, -4.75));
+	diffuseSphere->setCenter(Vector3(4.50, 1, -1.75));
 	diffuseSphere->setRadius(0.75);
 	diffuseSphere->setMaterial(bmat);
 	g_scene->addObject(diffuseSphere);
 
 	g_scene->preCalc();
-	g_scene->setSampleRate(1000);
+	g_scene->setSampleRate(100);
 }
 void
 makeTeapotScene()

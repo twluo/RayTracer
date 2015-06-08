@@ -274,9 +274,9 @@ Scene::photonTrace(Camera *cam, Image *img){
     int progress = 0;
     int bounceCount = 0;
     // loop over all pixels in the image
-#pragma omp parallel for
     for (int j = 0; j < img->height(); ++j)
-    {
+	{
+		#pragma omp parallel for
         for (int i = 0; i < img->width(); ++i)
         {
             Vector3 shadeResult;
@@ -287,7 +287,7 @@ Scene::photonTrace(Camera *cam, Image *img){
             shadeResult = Vector3(0);
             for (int k = 0; k < numOfSamples; k++) {
 				//if (k == 0)
-                   // ray = cam->eyeRay(i, j, img->width(), img->height());
+                    //ray = cam->eyeRay(i, j, img->width(), img->height());
                 //else
                     //ray = cam->randomRay(i, j, img->width(), img->height());
 				ray = cam->randomFOVRay(i, j, img->width(), img->height());
